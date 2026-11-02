@@ -35,7 +35,7 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] Barra variabili attive con icone.
 - [x] Pannello voto per livello, conferma. Campo "perché" (140) disattivato con `CHIEDI_PERCHE = false`: rallentava il gioco.
 - [x] Lenti dei 5 principali dopo il voto.
-- [x] "E poi?" fino alla schermata finale, disattivato (`aria-disabled`) finché non si emette il voto.
+- [x] Un solo pulsante nello stesso posto: "Emetti il voto" (attivo quando tutte le domande hanno risposta), poi diventa "E poi?" fino alla schermata finale.
 - [x] Schermata finale: sentenza, etichetta, avviso identità, riepilogo, confronto voti, somiglianza partita + totale, pulsanti.
 - [x] Router hash `#gioco`, `#s-<seed>`; condividi link; rigioca stesso seed.
 - [x] `window.__CHR__` completo → la suite di accettazione smette di saltarsi.

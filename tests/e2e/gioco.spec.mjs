@@ -101,18 +101,19 @@ test("chiusura anticipata: chi cede accende il verde e chiude", async ({ page })
   await expect(page.getByTestId("finale-somiglianza")).toContainText(/somigli a/);
 });
 
-test("E poi? resta disattivato finché non si emette il voto", async ({ page }) => {
+test("un solo pulsante: Emetti il voto, poi diventa E poi?", async ({ page }) => {
   await page.goto("/index.html#s-1");
-  const avanti = page.getByTestId("btn-avanti");
-  await expect(avanti).toHaveAttribute("aria-disabled", "true");
-  await expect(avanti).toHaveAccessibleDescription("Vota per andare avanti");
-  await avanti.click({ force: true });
-  expect(await chr(page, () => __CHR__.stato().livello)).toBe(0);
+  await expect(page.getByTestId("btn-avanti")).toHaveCount(0);
+  await expect(page.getByTestId("btn-vota")).toBeDisabled();
+  await expect(page.getByTestId("btn-vota")).toHaveAccessibleDescription(/emetti il voto/);
   await votaLivello(page);
-  await expect(avanti).not.toHaveAttribute("aria-disabled", "true");
-  await avanti.click();
+  await expect(page.getByTestId("btn-vota")).toHaveCount(0);
+  await expect(page.getByTestId("btn-avanti")).toBeFocused();
+  await expect(page.getByTestId("btn-avanti")).toContainText("E poi?");
+  await page.getByTestId("btn-avanti").click();
   expect(await chr(page, () => __CHR__.stato().livello)).toBe(1);
-  await expect(page.getByTestId("btn-avanti")).toHaveAttribute("aria-disabled", "true");
+  await expect(page.getByTestId("btn-avanti")).toHaveCount(0);
+  await expect(page.getByTestId("btn-vota")).toBeVisible();
 });
 
 test("il campo perché è disattivato per non rallentare il voto", async ({ page }) => {
