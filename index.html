@@ -134,6 +134,23 @@ main.layout.senza-semaforo { grid-template-columns: minmax(0, 1fr); }
 .perche label { font-weight: 700; }
 .perche input { font: inherit; padding: 10px 12px; border-radius: 8px; border: 2px solid var(--linea); background: var(--bg); color: var(--fg); width: 100%; }
 .contatore { color: var(--muted); font-size: 13px; text-align: right; }
+.turno { text-align: center; display: grid; gap: 10px; justify-items: center; padding: 28px 20px; }
+.turno h2 { font-size: 30px; }
+.turni { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 8px; padding: 0; }
+.turni li { padding: 2px 10px; border-radius: 999px; font-size: 14px; box-shadow: inset 0 0 0 1.5px var(--linea); }
+.turni li[data-stato="ora"] { box-shadow: inset 0 0 0 2px var(--fg); font-weight: 700; }
+.turni li[data-stato="fatto"] { color: var(--verde-testo); }
+.giocatori-col { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; }
+.giocatore-chip { font: 700 12px var(--font-testo); padding: 2px 8px; border-radius: 999px; background: var(--fg); color: var(--bg); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nomi-giocatori { list-style: none; padding: 0; margin: 12px 0 0; }
+.campo-nome { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.campo-nome input { font: inherit; font-size: 16px; padding: 8px 10px; border-radius: 8px; border: 2px solid var(--linea); background: var(--bg); color: var(--fg); width: 100%; }
+.banner-gruppo { margin: 0; font-weight: 700; font-size: 14px; }
+.btn[aria-pressed="true"] { background: var(--fg); color: var(--bg); box-shadow: inset 0 0 0 2px var(--fg); }
+.giurati { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.giurati li { display: flex; gap: 10px; align-items: center; background: var(--surface); border-radius: var(--raggio); padding: 10px; }
+.giurati svg { width: 48px; height: 80px; flex: none; }
+.gruppo-finale { display: grid; gap: 10px; }
 .riga-azioni { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
 .legenda-lenti { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: var(--muted); margin: 0 0 12px; padding: 0; list-style: none; }
 .legenda-lenti li { display: flex; align-items: center; gap: 6px; }
@@ -214,6 +231,10 @@ table.confronto td.uguale { color: var(--verde-testo); font-weight: 700; }
   .fumetto::after { display: none; }
   .fumetto { font-size: 16px; }
   .chip .nome { display: none; }
+  .timbro { font-size: 20px; padding: 4px 10px; max-width: 100%; }
+  .turno h2 { font-size: 24px; }
+  .campo-nome { grid-template-columns: minmax(0, 1fr) auto; }
+  .campo-nome label { grid-column: 1 / -1; }
   .barre li { grid-template-columns: minmax(0, 1fr) 64px 40px; font-size: 14px; }
   .scheda { padding: 16px; }
   .opzioni { grid-template-columns: repeat(min(var(--n), 3), minmax(0, 1fr)); }
@@ -246,6 +267,7 @@ table.confronto td.uguale { color: var(--verde-testo); font-weight: 700; }
     <a href="#personaggi" data-vista="personaggi" data-testid="nav-personaggi">Personaggi</a>
   </nav>
   <div class="azioni-top">
+    <button class="btn btn-sec btn-piccolo" type="button" data-azione="gruppo" data-testid="btn-multi" aria-pressed="false" title="Gioca in gruppo sullo stesso dispositivo"><span aria-hidden="true">👥</span> <span data-multi-etichetta>Gruppo</span></button>
     <button class="btn btn-sec btn-piccolo" type="button" data-azione="tema" data-testid="btn-tema" title="Cambia tema"><span aria-hidden="true">◐</span> Tema: <span data-tema-etichetta>Auto</span></button>
     <button class="btn" type="button" data-azione="nuova" data-testid="btn-nuova">Nuova grana</button>
   </div>
@@ -1564,6 +1586,12 @@ globalThis.Asset = (() => {
     seed: null, situazione: null, percorso: [], livello: 0, voti: [], finito: false,
     votato: false, bozza: {}, costruita: null, registrata: false,
   };
+  const MAX_GIOCATORI = 8;
+  const gruppo = {
+    attivo: false, setup: false, errore: "", turno: 0, pronto: false, voti: {},
+    nomi: Array.isArray(salvati.giocatori) && salvati.giocatori.length >= 2 ? salvati.giocatori.slice(0, MAX_GIOCATORI).map(String) : ["", ""],
+  };
+  const inGruppo = () => gruppo.attivo;
   const storico = () => stato.percorso.slice(0, stato.livello + 1);
   const passoCorrente = () => stato.percorso[stato.livello];
 
@@ -1576,6 +1604,7 @@ globalThis.Asset = (() => {
       vista: "gioco", seed, situazione: sit, percorso: M.simulaPercorso(sit, opz()),
       livello: 0, voti: [], finito: false, votato: false, bozza: {}, costruita, registrata: false,
     });
+    Object.assign(gruppo, { turno: 0, pronto: false, voti: {} });
   }
 
   function nuova(seed = nuovoSeed()) {
@@ -1608,6 +1637,7 @@ globalThis.Asset = (() => {
       stato.livello++;
       stato.votato = false;
       stato.bozza = {};
+      Object.assign(gruppo, { turno: 0, pronto: false });
       render();
       annunciaPasso();
     } else {
@@ -1633,9 +1663,51 @@ globalThis.Asset = (() => {
     render();
   }
 
+  function votiGiocatore(nome, lv) {
+    return Object.entries(gruppo.voti[nome]?.[lv] || {}).map(([domanda, valore]) => ({ livello: lv, domanda, valore }));
+  }
+
+  function votoDiGruppo(d, valori) {
+    if (!valori.length) return undefined;
+    if (d.tipo === "scala") {
+      const ord = [...valori].map(Number).sort((a, b) => a - b);
+      return ord[Math.floor((ord.length - 1) / 2)];
+    }
+    const conta = new Map();
+    for (const v of valori) conta.set(String(v), (conta.get(String(v)) || 0) + 1);
+    return [...conta.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  }
+
+  function votaGiocatore() {
+    const lv = stato.livello;
+    const nome = gruppo.nomi[gruppo.turno];
+    gruppo.voti[nome] = { ...(gruppo.voti[nome] || {}), [lv]: { ...stato.bozza } };
+    stato.bozza = {};
+    gruppo.turno++;
+    gruppo.pronto = false;
+    if (gruppo.turno < gruppo.nomi.length) {
+      render();
+      $("[data-testid=btn-turno-pronto]")?.focus();
+      return;
+    }
+    const risposte = {};
+    for (const d of M.domande(lv, stato.situazione)) {
+      const v = votoDiGruppo(d, gruppo.nomi.map(n => gruppo.voti[n]?.[lv]?.[d.id]).filter(x => x !== undefined));
+      if (v !== undefined) risposte[d.id] = v;
+    }
+    vota(risposte);
+    annuncia("Hanno votato tutti. Ecco i voti del gruppo e le lenti.");
+    $("[data-testid=btn-avanti]")?.focus();
+  }
+
   function registraPartita() {
     if (stato.registrata || !stato.voti.length) return;
     stato.registrata = true;
+    if (inGruppo()) {
+      const voce = { modo: "gruppo", seed: stato.costruita ? null : stato.seed, quando: new Date().toISOString(), luogo: stato.situazione.luogo.id, condotta: stato.situazione.condotta.id, esito: stato.percorso.at(-1).esito, etichetta: M.etichettaCaso(stato.voti, stato.situazione, stato.percorso, personaggi), voti: stato.voti, giocatori: Object.fromEntries(gruppo.nomi.map(n => [n, Object.keys(gruppo.voti[n] || {}).flatMap(lv => votiGiocatore(n, +lv))])) };
+      salva({ storico: [voce, ...(Array.isArray(salvati.storico) ? salvati.storico : [])].slice(0, 50) });
+      return;
+    }
     const sim = M.somiglianza(stato.voti, stato.situazione, stato.percorso, personaggi);
     const tot = { ...(salvati.somiglianza || {}) };
     for (const s of sim) if (s.distanza != null) {
@@ -1767,8 +1839,9 @@ globalThis.Asset = (() => {
     return M.lenti(stato.situazione, stato.percorso, livello, domandaId, personaggi);
   }
 
-  function domandaHTML(d, livello, votoUtente, mostraLenti) {
+  function domandaHTML(d, livello, votoUtente, mostraLenti, giocatori = null) {
     const scelto = votoUtente ?? stato.bozza[d.id];
+    const bloccato = votoUtente !== undefined || !!giocatori;
     const lenti = mostraLenti ? lentiPer(livello, d.id) : [];
     const n = d.opzioni.length;
     return `<fieldset class="domanda" data-testid="voto-domanda" data-id="${d.id}" data-tipo="${d.tipo}">
@@ -1777,9 +1850,11 @@ globalThis.Asset = (() => {
         ${d.opzioni.map(o => {
           const sel = scelto !== undefined && String(scelto) === String(o.valore);
           const chi = lenti.filter(l => String(l.valore) === String(o.valore));
+          const loro = (giocatori || []).filter(g => String(g.valore) === String(o.valore));
           return `<div class="opzione-col">
-            <button type="button" class="opzione" role="radio" aria-checked="${sel}" data-testid="voto-opzione" data-azione="opzione" data-domanda="${d.id}" data-valore="${esc(o.valore)}"${votoUtente !== undefined ? " disabled" : ""}>${esc(o.etichetta)}</button>
-            ${mostraLenti ? `${sel ? '<span class="tu">▲ tu</span>' : ""}<div class="lenti-col">${chi.map(l => {
+            <button type="button" class="opzione" role="radio" aria-checked="${sel}" data-testid="voto-opzione" data-azione="opzione" data-domanda="${d.id}" data-valore="${esc(o.valore)}"${bloccato ? " disabled" : ""}>${esc(o.etichetta)}</button>
+            ${giocatori ? `<div class="giocatori-col">${loro.map(g => `<span class="giocatore-chip" data-testid="voto-giocatore" data-nome="${esc(g.nome)}" data-valore="${esc(g.valore)}">${esc(g.nome)}</span>`).join("")}${sel ? '<span class="tu">▲ gruppo</span>' : ""}</div>` : ""}
+            ${mostraLenti ? `${sel && !giocatori ? '<span class="tu">▲ tu</span>' : ""}<div class="lenti-col">${chi.map(l => {
               const p = pgPerId(l.id);
               return `<span class="lente" data-testid="lente" data-id="${l.id}" data-valore="${esc(l.valore)}" title="${esc(p.nome)}: «${esc(p.lente)}»" role="img" aria-label="${esc(p.nome)} voterebbe ${esc(o.etichetta)}">${A.miniSVG(p)}</span>`;
             }).join("")}</div>` : ""}
@@ -1790,7 +1865,97 @@ globalThis.Asset = (() => {
     </fieldset>`;
   }
 
+  function turnoHTML() {
+    const lv = stato.livello, n = gruppo.nomi.length, nome = gruppo.nomi[gruppo.turno];
+    return `<section class="scheda turno" data-testid="turno-schermo" data-livello="${lv}" data-colore="${COLORE_LIVELLO(lv)}" aria-labelledby="titolo-turno">
+      <p class="nota">Livello ${lv} · voto ${gruppo.turno + 1} di ${n}</p>
+      <h2 id="titolo-turno">Tocca a <span data-testid="turno-nome">${esc(nome)}</span></h2>
+      <p>Passa il dispositivo. Tutti gli altri chiudono gli occhi. Sì, anche tu che stai sbirciando.</p>
+      <ol class="turni" aria-label="Ordine di voto">${gruppo.nomi.map((x, i) => `<li data-stato="${i < gruppo.turno ? "fatto" : i === gruppo.turno ? "ora" : "dopo"}">${esc(x)}${i < gruppo.turno ? " ✓" : ""}</li>`).join("")}</ol>
+      <button type="button" class="btn btn-grande" data-azione="turno-pronto" data-testid="btn-turno-pronto"><span class="freccia" aria-hidden="true">🙈</span><span>Sono ${esc(nome)}<small>Mostrami le domande</small></span></button>
+    </section>`;
+  }
+
+  function pannelloGruppoHTML() {
+    if (!stato.votato && !gruppo.pronto) return turnoHTML();
+    const lv = stato.livello, sit = stato.situazione;
+    const ds = M.domande(lv, sit);
+    const ultimo = lv === stato.percorso.length - 1;
+    if (!stato.votato) {
+      const nome = gruppo.nomi[gruppo.turno];
+      const completo = ds.every(d => stato.bozza[d.id] !== undefined);
+      return `<section class="scheda" data-testid="voto-pannello" data-livello="${lv}" data-giocatore="${esc(nome)}" data-colore="${COLORE_LIVELLO(lv)}" aria-labelledby="titolo-voto">
+        <h2 id="titolo-voto">Vota, ${esc(nome)}</h2>
+        <p class="nota">Voto segreto: i voti degli altri e le lenti arrivano quando hanno votato tutti.</p>
+        ${ds.map(d => domandaHTML(d, lv, undefined, false)).join("")}
+        <div class="riga-azioni">
+          <p class="nota" id="serve-voto" data-testid="voto-istruzioni">${gruppo.turno + 1 < gruppo.nomi.length ? `Dopo di te: ${esc(gruppo.nomi[gruppo.turno + 1])}.` : "Sei l'ultimo voto di questo livello."}</p>
+          <button type="button" class="btn btn-grande" data-azione="vota" data-testid="btn-vota" aria-describedby="serve-voto"${completo ? "" : " disabled"}><span class="freccia" aria-hidden="true">✓</span><span>Emetti il voto<small>${gruppo.turno + 1 < gruppo.nomi.length ? "E passa il dispositivo" : "Poi si scoprono le carte"}</small></span></button>
+        </div>
+      </section>`;
+    }
+    const gruppoVoti = Object.fromEntries(stato.voti.filter(v => v.livello === lv).map(v => [v.domanda, v.valore]));
+    const legenda = `<ul class="legenda-lenti" aria-label="Le lenti dei personaggi">${M.principali(personaggi).map(p => `<li title="«${esc(p.lente)}»">${A.miniSVG(p)} ${esc(p.nome)}</li>`).join("")}</ul>`;
+    const vicini = gruppo.nomi.map(nome => {
+      const sim = M.somiglianza(votiGiocatore(nome, lv), sit, stato.percorso, personaggi);
+      return `${esc(nome)} come ${esc(sim.filter(x => x.distanza === sim[0].distanza).map(x => x.nome).join(", "))}`;
+    }).join(" · ");
+    return `<section class="scheda" data-testid="voto-pannello" data-livello="${lv}" data-colore="${COLORE_LIVELLO(lv)}" aria-labelledby="titolo-voto">
+      <h2 id="titolo-voto">I voti del gruppo e le lenti</h2>
+      ${legenda}
+      ${ds.map(d => domandaHTML(d, lv, gruppoVoti[d.id], true, gruppo.nomi.map(nome => ({ nome, valore: gruppo.voti[nome]?.[lv]?.[d.id] })).filter(g => g.valore !== undefined))).join("")}
+      <div class="riga-azioni">
+        <p class="nota" data-testid="voto-confermato">A questo livello: ${vicini}.</p>
+        <button type="button" class="btn btn-grande" data-azione="avanti" data-testid="btn-avanti">
+          <span class="freccia" aria-hidden="true">${ultimo ? "⚖" : "➜"}</span><span>${ultimo ? "La sentenza" : "E poi?"}<small>${ultimo ? "Vai alla schermata finale" : "Cosa succede dopo"}</small></span>
+        </button>
+      </div>
+    </section>`;
+  }
+
+  function setupGruppoHTML() {
+    return `<div class="colonna"><section class="scheda" data-testid="multi-setup" data-colore="giallo" aria-labelledby="titolo-setup">
+      <h2 id="titolo-setup">Partita di gruppo</h2>
+      <p>Un solo dispositivo, da 2 a ${MAX_GIOCATORI} giudici. A ogni livello si vota uno alla volta, gli altri chiudono gli occhi, poi si scoprono tutti i voti insieme.</p>
+      <ol class="campi nomi-giocatori">${gruppo.nomi.map((n, i) => `<li class="campo-nome">
+        <label for="giocatore-${i}">Giocatore ${i + 1}</label>
+        <input id="giocatore-${i}" type="text" maxlength="20" autocomplete="off" data-testid="multi-nome" data-multi-nome="${i}" value="${esc(n)}" placeholder="Nome">
+        ${gruppo.nomi.length > 2 ? `<button type="button" class="btn btn-sec btn-piccolo" data-azione="multi-rimuovi" data-indice="${i}" data-testid="btn-multi-rimuovi" aria-label="Rimuovi giocatore ${i + 1}${n ? ` (${esc(n)})` : ""}">✕</button>` : ""}
+      </li>`).join("")}</ol>
+      ${gruppo.errore ? `<p class="avviso-identita" role="alert" data-testid="multi-errore">${esc(gruppo.errore)}</p>` : ""}
+      <div class="pulsanti" style="margin-top:16px">
+        ${gruppo.nomi.length < MAX_GIOCATORI ? `<button type="button" class="btn btn-sec" data-azione="multi-aggiungi" data-testid="btn-multi-aggiungi">+ Aggiungi giocatore</button>` : ""}
+        <button type="button" class="btn btn-grande" data-azione="multi-inizia" data-testid="btn-multi-inizia">Inizia in gruppo</button>
+        <button type="button" class="btn btn-sec" data-azione="multi-annulla" data-testid="btn-multi-annulla">Annulla</button>
+      </div>
+    </section></div>`;
+  }
+
+  function finaleGruppoHTML(sit, percorso) {
+    const tutte = Object.values(M.DOMANDE).flat();
+    const stat = gruppo.nomi.map(nome => {
+      const voti = Object.keys(gruppo.voti[nome] || {}).flatMap(lv => votiGiocatore(nome, +lv));
+      const sim = M.somiglianza(voti, sit, percorso, personaggi);
+      const uguali = voti.filter(v => String(stato.voti.find(g => g.domanda === v.domanda)?.valore) === String(v.valore)).length;
+      return { nome, top: voti.length ? pgPerId(sim[0].id) : null, accordo: voti.length ? Math.round(100 * uguali / voti.length) : 0 };
+    });
+    const perDomanda = stato.voti.map(g => {
+      const d = tutte.find(x => x.id === g.domanda);
+      const valori = gruppo.nomi.map(n => gruppo.voti[n]?.[g.livello]?.[g.domanda]).filter(v => v !== undefined);
+      const spread = d.tipo === "scala" ? Math.max(...valori) - Math.min(...valori) : new Set(valori.map(String)).size - 1;
+      return { g, d, unanime: new Set(valori.map(String)).size === 1, spread: d.tipo === "scala" ? spread / 4 : spread / Math.max(1, d.opzioni?.length - 1 || 1) };
+    });
+    const unanimi = perDomanda.filter(x => x.unanime).length;
+    const divisiva = [...perDomanda].sort((a, b) => b.spread - a.spread)[0];
+    return `<div class="gruppo-finale" data-testid="finale-gruppo">
+      <h3>Il verdetto della giuria</h3>
+      <p>Unanimi su <b data-testid="finale-unanimi">${unanimi}</b> domande su ${perDomanda.length}.${divisiva && !divisiva.unanime ? ` La più divisiva: <q>${esc(M.domande(LIV_DOMANDA[divisiva.g.domanda], sit).find(x => x.id === divisiva.g.domanda).testo)}</q>` : " Una giuria d'acciaio. Sospetto."}</p>
+      <ul class="giurati">${stat.map(x => `<li data-testid="finale-giocatore" data-nome="${esc(x.nome)}">${x.top ? A.avatarSVG(x.top, { espressione: "sollevato" }) : ""}<div><b>${esc(x.nome)}</b><br>${x.top ? `somiglia a ${esc(x.top.nome)}` : "non ha votato"}<br><span class="nota">d'accordo col gruppo al ${x.accordo}%</span></div></li>`).join("")}</ul>
+    </div>`;
+  }
+
   function pannelloVotoHTML() {
+    if (inGruppo()) return pannelloGruppoHTML();
     const lv = stato.livello, sit = stato.situazione;
     const ds = M.domande(lv, sit);
     const voti = Object.fromEntries(stato.voti.filter(v => v.livello === lv).map(v => [v.domanda, v.valore]));
@@ -1861,22 +2026,22 @@ globalThis.Asset = (() => {
       <p class="timbro" aria-label="Sentenza numero ${stato.seed}">Sentenza n. ${stato.seed}</p>
       <p class="etichetta" data-testid="finale-etichetta">${esc(cap(et))}.</p>
       ${sit.identita && richiestaFatta ? `<div class="avviso-identita" data-testid="finale-identita" role="note"><strong>⚠ Attenzione:</strong> qui non si chiedeva di cambiare cosa fai, ma cosa sei. La richiesta riguardava un'identità (${esc(sit.condotta.nome.toLowerCase())}), non una condotta. Cambia tutto.</div>` : ""}
-      <div class="somiglia" data-testid="finale-somiglianza">
+      ${inGruppo() ? finaleGruppoHTML(sit, percorso) : `<div class="somiglia" data-testid="finale-somiglianza">
         ${top ? `${A.avatarSVG(top, { espressione: "sollevato" })}<div><h3>In questa partita somigli a ${esc(top.nome)}</h3><p>${esc(BATTUTE_SOMIGLIANZA[top.id] || `«${top.lente}»`)}</p>${medie.length ? `<p class="nota">Nel totale delle partite (${salvati.partite || 0}) somigli di più a <b>${esc(medie[0].p.nome)}</b>.</p>` : ""}</div>`
           : `<div><h3>Nessun voto, nessuna somiglianza</h3><p>Hai guardato senza giudicare. Molto zen. O molto furbo.</p></div>`}
-      </div>
+      </div>`}
       <div>
         <h3>Il percorso</h3>
         <ol class="percorso">${percorso.map(p => `<li><span class="n" data-colore="${p.fine && p.cede ? "verde" : COLORE_LIVELLO(p.livello)}">${p.livello}</span><div><b>${esc(p.nome)}</b>: ${esc(p.sintesi)}${p.testi.find(t => t.chi !== "narratore") ? ` <q>${esc(M.testoPiano(p.testi.find(t => t.chi !== "narratore").testo))}</q> <span class="nota">(${esc(nomi(p.testi.find(t => t.chi !== "narratore").chi))})</span>` : ""}</div></li>`).join("")}</ol>
       </div>
       ${tutteDomande.length ? `<div>
-        <h3>I tuoi voti e le lenti</h3>
-        <p class="nota">A = ${esc(sit.autore.nome)} · B = ${esc(sit.osservatore.nome)}. In verde i voti uguali al tuo.</p>
+        <h3>${inGruppo() ? "I voti della giuria e le lenti" : "I tuoi voti e le lenti"}</h3>
+        <p class="nota">A = ${esc(sit.autore.nome)} · B = ${esc(sit.osservatore.nome)}. In verde i voti uguali ${inGruppo() ? "a quello del gruppo (mediana o maggioranza)" : "al tuo"}.</p>
         <div class="tabella-wrap" tabindex="0" role="region" aria-label="Tabella dei voti a confronto"><table class="confronto" data-testid="finale-confronto">
-          <thead><tr><th scope="col">Domanda</th><th scope="col">Tu</th>${M.principali(personaggi).map(p => `<th scope="col">${esc(p.nome)}</th>`).join("")}</tr></thead>
+          <thead><tr><th scope="col">Domanda</th><th scope="col">${inGruppo() ? "Gruppo" : "Tu"}</th>${inGruppo() ? gruppo.nomi.map(n => `<th scope="col">${esc(n)}</th>`).join("") : ""}${M.principali(personaggi).map(p => `<th scope="col">${esc(p.nome)}</th>`).join("")}</tr></thead>
           <tbody>${tutteDomande.map(d => {
             const tuo = stato.voti.find(v => v.domanda === d.id);
-            return `<tr><th scope="row">${esc(compilata(d.id).testo)}</th><td><b>${esc(etichettaValore(d, tuo?.valore))}</b>${tuo?.perche ? `<br><span class="nota">«${esc(tuo.perche)}»</span>` : ""}</td>${M.principali(personaggi).map(p => {
+            return `<tr><th scope="row">${esc(compilata(d.id).testo)}</th><td><b>${esc(etichettaValore(d, tuo?.valore))}</b>${tuo?.perche ? `<br><span class="nota">«${esc(tuo.perche)}»</span>` : ""}</td>${inGruppo() ? gruppo.nomi.map(n => { const v = gruppo.voti[n]?.[LIV_DOMANDA[d.id]]?.[d.id]; return `<td class="${String(v) === String(tuo?.valore) ? "uguale" : ""}">${esc(etichettaValore(d, v))}${String(v) === String(tuo?.valore) ? " ✓" : ""}</td>`; }).join("") : ""}${M.principali(personaggi).map(p => {
               const v = M.votoPrevisto(p, sit, d.id, percorso);
               return `<td class="${String(v) === String(tuo?.valore) ? "uguale" : ""}">${esc(etichettaValore(d, v))}${String(v) === String(tuo?.valore) ? " ✓" : ""}</td>`;
             }).join("")}</tr>`;
@@ -1894,6 +2059,7 @@ globalThis.Asset = (() => {
   }
 
   function vistaGioco() {
+    if (gruppo.setup) return setupGruppoHTML();
     if (!stato.situazione) {
       return `${semaforoHTML()}<div class="colonna"><section class="intro" data-testid="intro">
         <span class="cartello">Tutto tranquillo. Per ora.</span>
@@ -1908,6 +2074,7 @@ globalThis.Asset = (() => {
     return `${semaforoHTML()}<div class="colonna">
       <div class="intestazione-scena">
         <h2 data-testid="livello-nome">Livello ${p.livello} · ${esc(p.nome)}</h2>
+        ${inGruppo() ? `<p class="banner-gruppo" data-testid="multi-banner"><span aria-hidden="true">👥</span> Giuria: ${gruppo.nomi.map(esc).join(", ")}</p>` : ""}
         <p class="seed" data-testid="seed">${stato.costruita ? "Caso costruito a mano" : `Caso #s-${stato.seed} <button type="button" data-azione="condividi" title="Copia il link a questo caso">copia link</button>`}</p>
       </div>
       ${scenaHTML(sit, p)}
@@ -1926,7 +2093,10 @@ globalThis.Asset = (() => {
 
   function render() {
     const focusKey = document.activeElement?.dataset?.testid;
-    main.classList.toggle("senza-semaforo", stato.vista !== "gioco");
+    main.classList.toggle("senza-semaforo", stato.vista !== "gioco" || gruppo.setup);
+    const bm = $("[data-testid=btn-multi]");
+    bm.setAttribute("aria-pressed", String(inGruppo()));
+    bm.querySelector("[data-multi-etichetta]").textContent = inGruppo() ? "Da solo" : "Gruppo";
     main.innerHTML = VISTE_HTML[stato.vista]();
     for (const a of $$("nav.modi a")) {
       if (a.dataset.vista === stato.vista) a.setAttribute("aria-current", "page");
@@ -1980,12 +2150,63 @@ globalThis.Asset = (() => {
       if (btn) btn.disabled = !ds.every(x => stato.bozza[x.id] !== undefined);
     },
     vota: () => {
+      if (inGruppo()) return votaGiocatore();
       const perche = $("[data-testid=voto-perche]")?.value || "";
       vota({ ...stato.bozza, perche });
       $("[data-testid=btn-avanti]")?.focus();
     },
   };
   const AZIONI_ESTERNE = {};
+
+  Object.assign(AZIONI, {
+    gruppo: () => {
+      if (inGruppo()) {
+        Object.assign(gruppo, { attivo: false, turno: 0, pronto: false, voti: {} });
+        stato.bozza = {};
+        if (!stato.finito) { stato.votato = false; stato.voti = stato.voti.filter(v => v.livello !== stato.livello); }
+        render();
+        toast("Si torna a giocare da soli.");
+        return;
+      }
+      Object.assign(gruppo, { setup: true, errore: "" });
+      if (stato.vista !== "gioco") location.hash = "#gioco";
+      else render();
+      $("[data-testid=multi-nome]")?.focus();
+    },
+    "multi-aggiungi": () => {
+      if (gruppo.nomi.length >= MAX_GIOCATORI) return;
+      gruppo.nomi.push("");
+      render();
+      $$("[data-testid=multi-nome]").at(-1)?.focus();
+    },
+    "multi-rimuovi": el => {
+      if (gruppo.nomi.length <= 2) return;
+      gruppo.nomi.splice(+el.dataset.indice, 1);
+      render();
+      $("[data-testid=multi-nome]")?.focus();
+    },
+    "multi-annulla": () => {
+      gruppo.setup = false;
+      render();
+    },
+    "multi-inizia": () => {
+      const nomi = gruppo.nomi.map(n => n.trim().replace(/\s+/g, " "));
+      const vuoti = nomi.filter(n => !n).length;
+      const doppi = nomi.length !== new Set(nomi.map(n => n.toLowerCase())).size;
+      gruppo.errore = vuoti ? "Ogni giocatore ha bisogno di un nome." : doppi ? "Due giocatori con lo stesso nome? Così non si capisce chi ha votato cosa." : "";
+      if (gruppo.errore) { render(); $("[data-testid=multi-errore]")?.focus(); return; }
+      Object.assign(gruppo, { nomi, attivo: true, setup: false });
+      salva({ giocatori: nomi });
+      nuova();
+      $("[data-testid=btn-turno-pronto]")?.focus();
+    },
+    "turno-pronto": () => {
+      gruppo.pronto = true;
+      stato.bozza = {};
+      render();
+      $("[data-testid=voto-opzione]")?.focus();
+    },
+  });
 
   const editor = { sel: null };
   const PELLI = ["#F1D3B8", "#E0B48F", "#C08A63", "#8E5C3C", "#5E3B26"];
@@ -2442,6 +2663,7 @@ globalThis.Asset = (() => {
     if (fn) { e.preventDefault(); fn(el); }
   });
   document.addEventListener("input", e => {
+    if (e.target.dataset.multiNome !== undefined) gruppo.nomi[+e.target.dataset.multiNome] = e.target.value;
     if (e.target.closest("[data-testid=editor]") && (e.target.dataset.tratto || e.target.dataset.editor || e.target.dataset.avatar)) inputEditor(e.target);
     if (e.target.matches("[data-testid=voto-perche]")) {
       const c = $("[data-contatore]");
@@ -2486,7 +2708,7 @@ globalThis.Asset = (() => {
       applicaTema("auto");
       render();
     },
-    _interno: { stato, AZIONI, AZIONI_ESTERNE, VISTE_HTML, render, salva, storage, get personaggi() { return personaggi; }, set personaggi(v) { personaggi = v; }, salvaPersonaggi, toast, scenaHTML, avviaCostruita, paramsDaSituazione, pgPerId, opz, ind, nuovoCasoIndovina, costr },
+    _interno: { stato, AZIONI, AZIONI_ESTERNE, VISTE_HTML, render, salva, storage, get personaggi() { return personaggi; }, set personaggi(v) { personaggi = v; }, salvaPersonaggi, toast, scenaHTML, avviaCostruita, paramsDaSituazione, pgPerId, opz, ind, nuovoCasoIndovina, costr, gruppo },
   };
 })();
 </script>

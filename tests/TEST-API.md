@@ -80,6 +80,12 @@ Requisiti:
 | `lab-scena` · `lab-voto` · `lab-opzione` · `btn-lab-reset` | Laboratorio |
 | `costruisci-campo` · `costruisci-anteprima` · `costruisci-probabilita` · `costruisci-esiti` · `costruisci-errore` · `btn-costruisci-avvia` · `btn-costruisci-reset` | Costruisci il caso |
 | `indovina-scena` · `indovina-personaggio` · `indovina-opzione` · `indovina-esito` · `indovina-punteggio` · `btn-indovina-nuovo` | Indovina la lente |
+| `btn-multi` | Attiva/disattiva la partita di gruppo (`aria-pressed`) |
+| `multi-setup` · `multi-nome` · `multi-errore` · `btn-multi-aggiungi` · `btn-multi-rimuovi` · `btn-multi-inizia` · `btn-multi-annulla` | Setup della partita di gruppo |
+| `multi-banner` | Elenco della giuria sopra la scena |
+| `turno-schermo` · `turno-nome` · `btn-turno-pronto` | Schermata di passaggio tra un giocatore e l'altro |
+| `voto-giocatore` | Voto di un giocatore nella rivelazione (attributi `data-nome`, `data-valore`) |
+| `finale-gruppo` · `finale-giocatore` · `finale-unanimi` | Verdetto della giuria |
 | `editor` · `editor-elenco` · `editor-nome` · `editor-lente` · `editor-anteprima` · `editor-esempio` · `editor-elimina` | Editor personaggi |
 
 ## 3. Domande attese per livello (spec §5)

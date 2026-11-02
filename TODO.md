@@ -87,6 +87,16 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] Documentazione aggiornata (TEST-API, CLAUDE.md, STYLE).
 - [x] Galleria con viste mobile e tema scuro; verifica finale via Playwright MCP su Firefox.
 
+## Fetta 9 — Partita di gruppo (hot seat) ✅
+
+- [x] Singolo giocatore di default; pulsante "👥 Gruppo" nell'intestazione (`aria-pressed`), "Da solo" per tornare indietro.
+- [x] Setup: da 2 a 8 nomi, validazione (vuoti, duplicati), nomi ricordati sul dispositivo.
+- [x] A ogni livello: schermata di passaggio "Tocca a …, gli altri chiudono gli occhi", voto segreto senza lenti né voti altrui.
+- [x] Dopo l'ultimo voto: rivelazione con i voti di ognuno accanto alle lenti; voto del gruppo = mediana (scala) o maggioranza (scelte).
+- [x] Finale: verdetto della giuria (unanimità, domanda più divisiva), somiglianza e accordo col gruppo per giocatore, tabella con una colonna per giocatore.
+- [x] Storico con `modo: "gruppo"` e voti per giocatore; i totali di somiglianza personali non vengono sporcati.
+- [x] E2E dedicati + axe e mobile sulle 4 schermate di gruppo.
+
 ## Stato finale
 
 - 56 test unitari (motore + asset), 176 e2e su Firefox, Chromium, WebKit mobile, suite di accettazione AC1-AC10 verde.

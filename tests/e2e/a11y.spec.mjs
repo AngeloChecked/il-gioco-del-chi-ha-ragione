@@ -1,7 +1,28 @@
 import AxeBuilder from "@axe-core/playwright";
 import { test, expect, chr } from "./fixtures.mjs";
 
+async function gruppo(page) {
+  await page.goto("/index.html");
+  await page.getByTestId("btn-multi").click();
+  const campi = page.getByTestId("multi-nome");
+  await campi.nth(0).fill("Anna");
+  await campi.nth(1).fill("Bartolomeo Lunghissimo");
+}
+async function turno(page, i) {
+  await page.getByTestId("btn-turno-pronto").click();
+  for (const d of await page.getByTestId("voto-domanda").all()) await d.getByTestId("voto-opzione").nth(i).click();
+  await page.getByTestId("btn-vota").click();
+}
+
 const VISTE = {
+  "gruppo: setup": async page => gruppo(page),
+  "gruppo: turno": async page => { await gruppo(page); await page.getByTestId("btn-multi-inizia").click(); },
+  "gruppo: rivelazione": async page => { await gruppo(page); await page.getByTestId("btn-multi-inizia").click(); await turno(page, 0); await turno(page, 1); },
+  "gruppo: finale": async page => {
+    await gruppo(page);
+    await page.getByTestId("btn-multi-inizia").click();
+    while (!(await page.getByTestId("finale").count())) { await turno(page, 0); await turno(page, 1); await page.getByTestId("btn-avanti").click(); }
+  },
   intro: async page => page.goto("/index.html"),
   gioco: async page => page.goto("/index.html#s-482913"),
   "gioco con lenti": async page => {
