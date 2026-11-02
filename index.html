@@ -1520,6 +1520,7 @@ globalThis.Asset = (() => {
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const main = $("#contenuto");
 
+  const CHIEDI_PERCHE = false;
   const STORAGE_KEY = "chi-ha-ragione:v1";
   let memoria = {};
   const storage = {
@@ -1801,11 +1802,11 @@ globalThis.Asset = (() => {
       <h2 id="titolo-voto">${stato.votato ? "Il tuo voto e le lenti" : "Il tuo voto"}</h2>
       ${legenda}
       ${ds.map(d => domandaHTML(d, lv, stato.votato ? voti[d.id] : undefined, stato.votato)).join("")}
-      <div class="perche">
+      ${CHIEDI_PERCHE ? `      <div class="perche">
         <label for="perche">Perché? <span class="nota">(facoltativo)</span></label>
         <input id="perche" type="text" maxlength="140" data-testid="voto-perche" value="${esc(perche)}" ${stato.votato ? "disabled" : ""} placeholder="In 140 caratteri, come un vecchio tweet">
         <span class="contatore" data-contatore>${perche.length}/140</span>
-      </div>
+      </div>` : ""}
       <div class="riga-azioni">
         ${stato.votato
           ? `<p class="nota" data-testid="voto-confermato">${vicinanzaTesto(lv)}</p>`

@@ -100,15 +100,10 @@ test("chiusura anticipata: chi cede accende il verde e chiude", async ({ page })
   await expect(page.getByTestId("finale-somiglianza")).toContainText(/Nessun voto/);
 });
 
-test("il campo perché accetta al massimo 140 caratteri e finisce nel finale", async ({ page }) => {
+test("il campo perché è disattivato per non rallentare il voto", async ({ page }) => {
   await page.goto("/index.html#s-1");
-  const campo = page.getByTestId("voto-perche");
-  await campo.fill("x".repeat(200));
-  expect((await campo.inputValue()).length).toBe(140);
-  await campo.fill("Perché sì");
-  await votaLivello(page);
-  await chr(page, () => { while (!__CHR__.stato().finito) __CHR__.avanti(); });
-  await expect(page.getByTestId("finale-confronto")).toContainText("Perché sì");
+  await expect(page.getByTestId("voto-pannello")).toBeVisible();
+  await expect(page.getByTestId("voto-perche")).toHaveCount(0);
 });
 
 test("richiesta su un'identità: avviso nel finale (AC9)", async ({ page }) => {

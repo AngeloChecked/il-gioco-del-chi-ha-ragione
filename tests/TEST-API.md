@@ -55,7 +55,7 @@ Requisiti:
 | `voto-pannello` | Pannello voto (attributo `data-livello`) |
 | `voto-domanda` | Ogni domanda (attributo `data-id`, `data-tipo="scala/sino/scelta/oggetto"`) |
 | `voto-opzione` | Ogni opzione cliccabile (attributo `data-valore`) |
-| `voto-perche` | Campo "perché" |
+| `voto-perche` | Campo "perché" (presente solo con `CHIEDI_PERCHE = true` nell'app; disattivato di default) |
 | `btn-vota` | Conferma voto |
 | `lente` | Mini-avatar lente (attributi `data-id`, `data-valore`) |
 | `finale` | Schermata finale |

@@ -33,7 +33,7 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] Fumetti posizionati con coda (parlato, urlato, sussurro, pensiero, narratore, sistema) + adesivo di censura.
 - [x] Semaforo colorato per livello, verde se qualcuno cede.
 - [x] Barra variabili attive con icone.
-- [x] Pannello voto per livello, campo "perché" 140, conferma.
+- [x] Pannello voto per livello, conferma. Campo "perché" (140) disattivato con `CHIEDI_PERCHE = false`: rallentava il gioco.
 - [x] Lenti dei 5 principali dopo il voto.
 - [x] "E poi?" fino alla schermata finale.
 - [x] Schermata finale: sentenza, etichetta, avviso identità, riepilogo, confronto voti, somiglianza partita + totale, pulsanti.

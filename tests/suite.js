@@ -107,7 +107,7 @@
       const ids = $$("voto-domanda", pannello).map(d => d.dataset.id);
       assert(eq(ids, DOMANDE[lv]), `livello ${lv}: domande ${ids} attese ${DOMANDE[lv]}`);
       const perche = $("voto-perche", pannello);
-      assert(perche && +perche.maxLength === 140, `livello ${lv}: campo perché assente o maxlength != 140`);
+      if (perche) assert(+perche.maxLength === 140, `livello ${lv}: campo perché con maxlength != 140`);
       await votaTutto();
       if (lv < 6) await click($("btn-avanti"));
     }
