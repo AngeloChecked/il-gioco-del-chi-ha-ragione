@@ -24,7 +24,7 @@ La shell di default ha Node 18, che Playwright non supporta. Prefissare con `PAT
 | `npm run galleria` | Screenshot di revisione in `tests/output/galleria/` (`-- --solo=avatar\|luoghi\|livelli\|<vista>`) |
 | `npm run browsers` | Reinstalla i browser di Playwright (runner + MCP) |
 
-Skill `/test-gioco`: controllo visivo via Playwright MCP (Firefox), dopo `npm run verifica`.
+Skill `/test-gioco`: controllo visivo via Playwright MCP (Firefox), dopo `npm run verifica`. Config MCP locale in `.mcp.json` (ignorato da git, contiene percorsi della macchina): copiare `.mcp.json.example` e, se la shell non ha Node 22, mettere il percorso assoluto di Node 22 in `command`.
 
 ## Architettura
 
