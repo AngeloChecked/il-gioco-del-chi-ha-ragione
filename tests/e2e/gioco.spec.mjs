@@ -93,11 +93,26 @@ test("partita completa fino alla sentenza (AC2-AC5)", async ({ page }) => {
 test("chiusura anticipata: chi cede accende il verde e chiude", async ({ page }) => {
   const seed = await trovaSeed(page, "p.length === 4 && p[3].esito === 'accetta'");
   await page.goto(`/index.html#s-${seed}`);
-  for (let i = 0; i < 3; i++) await page.getByTestId("btn-avanti").click();
+  for (let i = 0; i < 3; i++) { await votaLivello(page); await page.getByTestId("btn-avanti").click(); }
   await expect(page.locator(".luce.cede")).toHaveCount(1);
+  await votaLivello(page);
   await page.getByTestId("btn-avanti").click();
   await expect(page.getByTestId("finale")).toBeVisible();
-  await expect(page.getByTestId("finale-somiglianza")).toContainText(/Nessun voto/);
+  await expect(page.getByTestId("finale-somiglianza")).toContainText(/somigli a/);
+});
+
+test("E poi? resta disattivato finché non si emette il voto", async ({ page }) => {
+  await page.goto("/index.html#s-1");
+  const avanti = page.getByTestId("btn-avanti");
+  await expect(avanti).toHaveAttribute("aria-disabled", "true");
+  await expect(avanti).toHaveAccessibleDescription("Vota per andare avanti");
+  await avanti.click({ force: true });
+  expect(await chr(page, () => __CHR__.stato().livello)).toBe(0);
+  await votaLivello(page);
+  await expect(avanti).not.toHaveAttribute("aria-disabled", "true");
+  await avanti.click();
+  expect(await chr(page, () => __CHR__.stato().livello)).toBe(1);
+  await expect(page.getByTestId("btn-avanti")).toHaveAttribute("aria-disabled", "true");
 });
 
 test("il campo perché è disattivato per non rallentare il voto", async ({ page }) => {

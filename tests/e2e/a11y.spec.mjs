@@ -65,6 +65,8 @@ test("le espressioni dei personaggi sono descritte a parole", async ({ page }) =
 test("i nuovi fumetti sono annunciati agli screen reader", async ({ page }) => {
   await page.goto("/index.html#s-482913");
   await expect(page.getByTestId("annunci")).toHaveText(/Livello 0/);
+  await page.getByTestId("voto-opzione").first().click();
+  await page.getByTestId("btn-vota").click();
   await page.getByTestId("btn-avanti").click();
   await expect(page.getByTestId("annunci")).toHaveText(/Livello 1/);
 });

@@ -134,6 +134,7 @@ main.layout.senza-semaforo { grid-template-columns: minmax(0, 1fr); }
 .perche label { font-weight: 700; }
 .perche input { font: inherit; padding: 10px 12px; border-radius: 8px; border: 2px solid var(--linea); background: var(--bg); color: var(--fg); width: 100%; }
 .contatore { color: var(--muted); font-size: 13px; text-align: right; }
+.azione-voto { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .riga-azioni { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
 .legenda-lenti { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: var(--muted); margin: 0 0 12px; padding: 0; list-style: none; }
 .legenda-lenti li { display: flex; align-items: center; gap: 6px; }
@@ -1810,8 +1811,8 @@ globalThis.Asset = (() => {
       <div class="riga-azioni">
         ${stato.votato
           ? `<p class="nota" data-testid="voto-confermato">${vicinanzaTesto(lv)}</p>`
-          : `<button type="button" class="btn btn-sec" data-azione="vota" data-testid="btn-vota"${completo ? "" : " disabled"}>Emetti il voto</button>`}
-        <button type="button" class="btn btn-grande" data-azione="avanti" data-testid="btn-avanti">
+          : `<span class="azione-voto"><button type="button" class="btn btn-sec" data-azione="vota" data-testid="btn-vota"${completo ? "" : " disabled"}>Emetti il voto</button><span class="nota" id="serve-voto">Vota per andare avanti</span></span>`}
+        <button type="button" class="btn btn-grande" data-azione="avanti" data-testid="btn-avanti"${stato.votato ? "" : ' aria-disabled="true" aria-describedby="serve-voto"'}>
           <span class="freccia" aria-hidden="true">${ultimo ? "⚖" : "➜"}</span><span>${ultimo ? "La sentenza" : "E poi?"}<small>${ultimo ? "Vai alla schermata finale" : "Cosa succede dopo"}</small></span>
         </button>
       </div>
