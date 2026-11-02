@@ -174,7 +174,8 @@ table.confronto td.uguale { color: var(--verde-testo); font-weight: 700; }
 .campo textarea { min-height: 80px; resize: vertical; }
 .campo[data-attiva="true"] select { border-color: var(--giallo); box-shadow: 0 0 0 2px var(--giallo); }
 .campo select:disabled { opacity: .55; }
-.grafico svg { width: 100%; height: auto; display: block; }
+.grafico > svg { width: 100%; height: auto; display: block; }
+.grafico .legenda-lenti { margin-top: 8px; }
 .grafico text { font-family: var(--font-testo); fill: var(--fg); }
 
 .schede-pg { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
@@ -212,8 +213,12 @@ table.confronto td.uguale { color: var(--verde-testo); font-weight: 700; }
   .opzioni { grid-template-columns: repeat(min(var(--n), 3), minmax(0, 1fr)); }
   .opzioni[data-tipo="scala"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
+.scena-box.fumetti-sotto { background: var(--surface); }
+.fumetti-sotto .fumetti { position: static; display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+.fumetti-sotto .fumetto-pos, .fumetti-sotto .fumetto-pos.narr { position: static; max-width: none; width: auto; transform: none; }
+.fumetti-sotto .fumetto::after { display: none; }
 @media (min-width: 721px) {
-  .fumetto .chi { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .scena-box:not(.fumetti-sotto) .fumetto .chi { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -1113,7 +1118,8 @@ globalThis.Motore = (() => {
         return v >= 0.5 ? "si" : "no";
       }
       case "richiesta_ragionevole": {
-        let v = 0.4 * s + 0.3 * tr.rispetto_contesto + 0.3 * (1 - tr.fastidio_intromissioni);
+        let v = 0.4 * s + 0.3 * tr.rispetto_contesto + 0.3 * (1 - tr.fastidio_intromissioni)
+          + 0.3 * bambiniVicini(m) + 0.3 * (inten - 0.6) + 0.15 * (sit.luogo.silenzio - 0.2) * tr.rispetto_contesto;
         if (id) v *= 0.35;
         return scala(v - malusStile + (c.danno_oggettivo ? 0.2 : 0));
       }
@@ -1683,8 +1689,7 @@ globalThis.Asset = (() => {
     render();
   }
 
-  const nomeChi = () => {
-    const s = stato.situazione;
+  const nomeChi = (s = stato.situazione) => {
     const mappa = Object.fromEntries([s.autore, s.osservatore, ...s.amici].map(p => [p.id, p.nome]));
     return chi => (chi === "terzo" ? cap(s.terzo || "il terzo") : chi === "folla" ? "Qualcuno tra il pubblico" : mappa[chi] || chi);
   };
@@ -1702,7 +1707,7 @@ globalThis.Asset = (() => {
 
   function fumettiHTML(sit, passo) {
     const pos = A.posizioni(sit, passo);
-    const nomi = nomeChi();
+    const nomi = nomeChi(sit);
     let k = 0;
     return passo.testi.map(t => {
       const contenuto = `<span class="chi">${esc(nomi(t.chi))}</span><span class="testo">${testoHTML(t.testo, sit)}</span>`;
@@ -1901,7 +1906,7 @@ globalThis.Asset = (() => {
 
   const VISTE_HTML = {
     gioco: vistaGioco,
-    laboratorio: () => `<div class="colonna"><section class="intro"><h2>Laboratorio</h2><p>In arrivo.</p></section></div>`,
+    laboratorio: () => vistaLaboratorio(),
     indovina: () => `<div class="colonna"><section class="intro"><h2>Indovina la lente</h2><p>In arrivo.</p></section></div>`,
     costruisci: () => `<div class="colonna"><section class="intro"><h2>Costruisci il caso</h2><p>In arrivo.</p></section></div>`,
     personaggi: () => vistaPersonaggi(),
@@ -2066,6 +2071,134 @@ globalThis.Asset = (() => {
     aggiornaEditorInPlace(p);
   }
 
+  const MO = M.MODULATORI;
+  const LAB_VARIABILI = [
+    { nome: "luogo", etichetta: "Luogo", opzioni: M.LUOGHI.map(l => [l.id, l.nome]) },
+    { nome: "condotta", etichetta: "Condotta", opzioni: M.CONDOTTE.map(c => [c.id, c.nome]) },
+    { nome: "volume", etichetta: "Volume", opzioni: MO.volume.valori.map((v, i) => [i, v]), numero: true },
+    { nome: "frequenza", etichetta: "Frequenza", opzioni: MO.frequenza.valori.map((v, i) => [i, v]), numero: true },
+    { nome: "intento", etichetta: "Intento", opzioni: MO.intento.valori.map(v => [v, v]) },
+    { nome: "destinatario", etichetta: "Destinatario", opzioni: MO.destinatario.valori.map(v => [v, v]) },
+    { nome: "bambini", etichetta: "Bambini", opzioni: MO.bambini.valori.map((v, i) => [i, v]), numero: true },
+    { nome: "rapporto", etichetta: "Rapporto tra le parti", opzioni: MO.rapporto.valori.map(v => [v, v]) },
+    { nome: "pubblico", etichetta: "Pubblico", opzioni: MO.pubblico.valori.map((v, i) => [i, v]), numero: true },
+    { nome: "stile", etichetta: "Stile della richiesta", opzioni: M.STILI.map(v => [v, v]) },
+    { nome: "forma", etichetta: "Forma della richiesta", opzioni: M.FORME.map(v => [v, v]) },
+    { nome: "motivazione", etichetta: "Motivazione dichiarata", opzioni: M.MOTIVAZIONI.map(v => [v, v]) },
+  ];
+  const lab = { attiva: null, params: { ...M.CASO_BASE }, voti: {} };
+  const varLab = nome => LAB_VARIABILI.find(v => v.nome === nome);
+  const chiaveLab = () => (lab.attiva ? String(lab.params[lab.attiva]) : "base");
+
+  function situazioneLab(params = lab.params) {
+    const sit = M.costruisciSituazione({ ...params, seed: 1 }, opz());
+    const passi = M.simulaPercorso(sit, { ...opz(), forza: { 1: "chiede" } });
+    return { sit, passi };
+  }
+
+  function scenaLab() {
+    const { sit, passi } = situazioneLab();
+    const p2 = passi[2];
+    const passo = { ...p2, testi: [passi[0].testi[1], p2.testi[0]] };
+    return { sit, passi, html: `<div class="scena-box fumetti-sotto" data-testid="lab-scena"><div class="scena-svg">${A.scena(sit, passo, terzoPg())}</div><div class="fumetti">${fumettiHTML(sit, passo)}</div></div>` };
+  }
+
+  function lentiLab(params) {
+    const { sit, passi } = situazioneLab(params);
+    return M.lenti(sit, passi, 2, "richiesta_ragionevole", personaggi);
+  }
+
+  function graficoLab() {
+    const W = 680, H = 300, ml = 40, mr = 16, mt = 16, mb = 86;
+    const v = lab.attiva ? varLab(lab.attiva) : null;
+    const xs = v ? v.opzioni : [["base", "caso base"]];
+    const passo = (W - ml - mr) / Math.max(1, xs.length - 1 || 1);
+    const X = i => (xs.length === 1 ? (W - ml - mr) / 2 + ml : ml + i * passo);
+    const Y = val => mt + (5 - val) * (H - mt - mb) / 4;
+    const linee = M.principali(personaggi).map(p => {
+      const punti = xs.map(([val], i) => {
+        const params = v ? { ...lab.params, [v.nome]: v.numero ? +val : val } : lab.params;
+        return [X(i), Y(lentiLab(params).find(l => l.id === p.id).valore)];
+      });
+      return { p, punti };
+    });
+    const miei = xs.map(([val], i) => [i, lab.voti[String(val)]]).filter(([, y]) => y != null);
+    const off = (k, n) => (k - (n - 1) / 2) * 3;
+    return `<figure class="grafico" data-testid="lab-grafico" data-punti="${miei.length}">
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafico: il tuo voto di ragionevolezza${v ? ` al variare di ${esc(v.etichetta.toLowerCase())}` : ""}, confrontato con le lenti">
+        ${[1, 2, 3, 4, 5].map(y => `<line x1="${ml}" x2="${W - mr}" y1="${Y(y)}" y2="${Y(y)}" stroke="currentColor" stroke-opacity=".15"/><text x="${ml - 10}" y="${Y(y) + 5}" text-anchor="end" font-size="13">${y}</text>`).join("")}
+        ${xs.map(([, et], i) => `<text transform="translate(${X(i)} ${H - mb + 18}) rotate(${xs.length > 4 ? -35 : 0})" text-anchor="${xs.length > 4 ? "end" : "middle"}" font-size="12">${esc(et.length > 18 ? et.slice(0, 17) + "…" : et)}</text>`).join("")}
+        ${linee.map(({ p, punti }, k) => `<polyline points="${punti.map(([x, y]) => `${x},${y + off(k, linee.length)}`).join(" ")}" fill="none" stroke="${esc(p.avatar?.colore || "#888")}" stroke-width="2.5" stroke-opacity=".85" stroke-dasharray="${k % 2 ? "6 4" : "none"}"/>`).join("")}
+        ${miei.length > 1 ? `<polyline points="${miei.map(([i, y]) => `${X(i)},${Y(y)}`).join(" ")}" fill="none" stroke="currentColor" stroke-width="4"/>` : ""}
+        ${miei.map(([i, y]) => `<circle cx="${X(i)}" cy="${Y(y)}" r="7" fill="var(--giallo)" stroke="currentColor" stroke-width="3"/>`).join("")}
+      </svg>
+      <figcaption><ul class="legenda-lenti"><li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="var(--giallo)" stroke="currentColor" stroke-width="3"/></svg> Tu</li>${linee.map(({ p }, k) => `<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12 H22" stroke="${esc(p.avatar?.colore || "#888")}" stroke-width="3" stroke-dasharray="${k % 2 ? "5 3" : "none"}"/></svg>${esc(p.nome)}</li>`).join("")}</ul>
+      ${v ? "" : `<p class="nota">Cambia una variabile per vedere come si sposta il giudizio.</p>`}</figcaption>
+    </figure>`;
+  }
+
+  function vistaLaboratorio() {
+    const { html } = scenaLab();
+    const chiave = chiaveLab();
+    const mio = lab.voti[chiave];
+    const lenti = lentiLab(lab.params);
+    const v = lab.attiva ? varLab(lab.attiva) : null;
+    const valoreAttuale = v ? v.opzioni.find(([val]) => String(val) === String(lab.params[v.nome]))?.[1] : null;
+    return `<div class="colonna">
+      <div class="intestazione-scena"><h2>Laboratorio</h2><p class="nota">Caso base: due adulti al parco, uno bestemmia una volta, uno sconosciuto chiede gentilmente. Cambia <b>una sola</b> variabile e vota di nuovo.</p></div>
+      <div class="griglia-2">
+        <div class="colonna">
+          ${html}
+          <section class="scheda" data-colore="giallo" aria-labelledby="titolo-lab-voto" data-testid="lab-voto">
+            <h3 id="titolo-lab-voto">È ragionevole questa richiesta?${v ? ` <span class="nota">(${esc(v.etichetta.toLowerCase())}: ${esc(valoreAttuale)})</span>` : ""}</h3>
+            <div class="opzioni" data-tipo="scala" style="--n:5" role="radiogroup" aria-label="È ragionevole questa richiesta?">
+              ${[1, 2, 3, 4, 5].map(n => `<div class="opzione-col"><button type="button" class="opzione" role="radio" aria-checked="${mio === n}" data-azione="lab-vota" data-testid="lab-opzione" data-valore="${n}">${n}</button>
+                ${mio != null ? `${mio === n ? '<span class="tu">▲ tu</span>' : ""}<div class="lenti-col">${lenti.filter(l => l.valore === n).map(l => { const p = pgPerId(l.id); return `<span class="lente" data-testid="lente" data-id="${l.id}" title="${esc(p.nome)}: «${esc(p.lente)}»" role="img" aria-label="${esc(p.nome)} voterebbe ${n}">${A.miniSVG(p)}</span>`; }).join("")}</div>` : ""}</div>`).join("")}
+            </div>
+            <div class="estremi"><span>1 · per niente</span><span>5 · del tutto</span></div>
+          </section>
+          ${graficoLab()}
+        </div>
+        <section class="scheda" aria-labelledby="titolo-variabili" data-colore="verde">
+          <h3 id="titolo-variabili">Variabili</h3>
+          <p class="nota">${v ? `Stai esplorando <b>${esc(v.etichetta.toLowerCase())}</b>. Le altre sono bloccate.` : "Tocca una variabile: le altre si bloccano."}</p>
+          <div class="campi">
+            ${LAB_VARIABILI.map(x => `<div class="campo" data-testid="lab-variabile" data-nome="${x.nome}" data-attiva="${lab.attiva === x.nome}">
+              <label for="lab-${x.nome}">${esc(x.etichetta)}</label>
+              <select id="lab-${x.nome}" data-lab="${x.nome}"${lab.attiva && lab.attiva !== x.nome ? " disabled" : ""}>${x.opzioni.map(([val, et]) => `<option value="${esc(val)}"${String(val) === String(lab.params[x.nome]) ? " selected" : ""}>${esc(et)}${String(val) === String(M.CASO_BASE[x.nome]) ? " (base)" : ""}</option>`).join("")}</select>
+            </div>`).join("")}
+          </div>
+          <div class="pulsanti" style="margin-top:16px"><button type="button" class="btn btn-sec" data-azione="lab-reset" data-testid="btn-lab-reset"${lab.attiva || Object.keys(lab.voti).length ? "" : " disabled"}>Cambia variabile</button></div>
+        </section>
+      </div>
+    </div>`;
+  }
+
+  function cambiaLab(el) {
+    const v = varLab(el.dataset.lab);
+    if (!v || (lab.attiva && lab.attiva !== v.nome)) return;
+    if (!lab.attiva) {
+      lab.attiva = v.nome;
+      if (lab.voti.base != null) lab.voti = { [String(M.CASO_BASE[v.nome])]: lab.voti.base };
+    }
+    lab.params = { ...lab.params, [v.nome]: v.numero ? +el.value : el.value };
+    render();
+    $(`[data-lab="${v.nome}"]`)?.focus();
+  }
+
+  Object.assign(AZIONI, {
+    "lab-vota": el => {
+      lab.voti[chiaveLab()] = +el.dataset.valore;
+      render();
+      $(`[data-testid=lab-opzione][data-valore="${el.dataset.valore}"]`)?.focus();
+    },
+    "lab-reset": () => {
+      Object.assign(lab, { attiva: null, params: { ...M.CASO_BASE }, voti: {} });
+      render();
+      $("[data-lab]")?.focus();
+    },
+  });
+
   Object.assign(AZIONI, {
     "seleziona-pg": el => { editor.sel = el.dataset.id; render(); $(`[data-testid=editor-personaggio][data-id="${CSS.escape(el.dataset.id)}"]`)?.focus(); },
     "pg-duplica": () => {
@@ -2122,6 +2255,9 @@ globalThis.Asset = (() => {
       const c = $("[data-contatore]");
       if (c) c.textContent = `${e.target.value.length}/140`;
     }
+  });
+  document.addEventListener("change", e => {
+    if (e.target.dataset.lab) cambiaLab(e.target);
   });
   document.addEventListener("keydown", e => {
     const el = e.target.closest?.("[role=radio]");

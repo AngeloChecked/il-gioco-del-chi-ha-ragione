@@ -337,6 +337,13 @@ describe("voto e lenti", () => {
     assert.ok(v("luca") > v("ettore"), `luca ${v("luca")} ettore ${v("ettore")}`);
   });
 
+  test("il contesto sposta la ragionevolezza: bambini vicini, volume, silenzio", () => {
+    const v = (id, params) => M.votoPrevisto(M.PERSONAGGI.find(p => p.id === id), M.costruisciSituazione(params), "richiesta_ragionevole", []);
+    assert.ok(v("ettore", { bambini: 2 }) > v("ettore", { bambini: 0 }), "Ettore e i bambini");
+    assert.ok(v("marco", { volume: 3, frequenza: 2 }) >= v("marco", { volume: 0 }), "volume");
+    assert.ok(v("marco", { luogo: "biblioteca" }) >= v("marco", { luogo: "piazza" }), "silenzio atteso");
+  });
+
   test("Sara trova lecito rifiutare, Luca no, se la richiesta è sulla bestemmia", () => {
     const sit = M.costruisciSituazione({});
     const passi = M.simulaPercorso(sit, { forza: { 1: "chiede", 3: "rifiuta_gentile" } });

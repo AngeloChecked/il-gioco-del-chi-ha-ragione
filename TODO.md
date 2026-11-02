@@ -56,11 +56,13 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] I personaggi modificati entrano nelle partite e nelle lenti.
 - [x] E2E con reload.
 
-## Fetta 5 — Laboratorio (AC 7)
+## Fetta 5 — Laboratorio (AC 7) ✅
 
-- [ ] Caso base fisso, una sola variabile modificabile, scena aggiornata.
-- [ ] Voto di ragionevolezza per valore, grafico tuo voto vs lenti.
-- [ ] E2E.
+- [x] Caso base fisso, una sola variabile modificabile, scena aggiornata.
+- [x] Voto di ragionevolezza per valore, grafico tuo voto vs lenti.
+- [x] E2E.
+- [x] Voto previsto della ragionevolezza sensibile al contesto (bambini vicini, intensità, silenzio atteso), così le lenti si muovono nel grafico.
+- [x] Suite di accettazione AC1-AC10 completamente verde, nessun test in sviluppo.
 
 ## Fetta 6 — Costruisci il caso
 

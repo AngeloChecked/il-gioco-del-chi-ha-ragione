@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { test, expect } from "@playwright/test";
 
 const suite = readFileSync(fileURLToPath(new URL("../suite.js", import.meta.url)), "utf8");
-const IN_SVILUPPO = ["AC7"];
+const IN_SVILUPPO = [];
 const API_COMPLETA = ["avanti", "vota", "simulaPercorso", "testiPercorso", "lenti", "dati", "resetStorage"];
 
 test("criteri di accettazione AC1-AC10 (tests/suite.js)", async ({ page }) => {
