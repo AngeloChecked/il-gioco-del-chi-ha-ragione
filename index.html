@@ -4,66 +4,249 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chi ha ragione?</title>
+<meta name="description" content="Il tribunale del marciapiede: liti da spazio pubblico, voti su piani separati, lenti dei personaggi.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --asfalto:#2E3136; --gesso:#F7F7F2;
-  --bg:var(--gesso); --fg:var(--asfalto); --surface:#FFFFFF; --muted:#6B6F76;
-  --blu:#1F4E9C; --blu-pulsante:#1F4E9C; --giallo:#F2C230; --rosso:#C8322B; --verde:#3F8F5B; --verde-testo:#2F6E45;
+  --bg:var(--gesso); --fg:var(--asfalto); --surface:#FFFFFF; --muted:#5F636A; --linea:#D5D6D0;
+  --blu:#1F4E9C; --blu-pulsante:#1F4E9C; --giallo:#F2C230; --rosso:#C8322B; --verde:#3F8F5B; --verde-testo:#2F6E45; --rosso-testo:#B02A24;
   --font-titoli:"Bricolage Grotesque", system-ui, sans-serif;
   --font-testo:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --raggio:12px;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#A9ADB3;
-    --blu:#5B8DEF; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
+    --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#B4B8BE; --linea:#555A62;
+    --blu:#7FA6F2; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#6FC28B; --rosso-testo:#F07A73;
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#A9ADB3;
-  --blu:#5B8DEF; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
+  --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#B4B8BE; --linea:#555A62;
+  --blu:#7FA6F2; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#6FC28B; --rosso-testo:#F07A73;
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.5 var(--font-testo); }
-header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px 24px; }
-h1 { font: 800 32px/1.1 var(--font-titoli); margin: 0; }
-.btn { font: 700 17px var(--font-titoli); color: #fff; background: var(--blu-pulsante); border: 0; border-radius: 8px; padding: 10px 18px; box-shadow: inset 0 0 0 2px #fff; cursor: pointer; transition: transform .15s; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.5 var(--font-testo); overflow-x: hidden; }
+h2, h3 { font-family: var(--font-titoli); line-height: 1.15; margin: 0 0 8px; }
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 18px; font-weight: 700; }
+p { margin: 0 0 8px; }
+a { color: var(--blu); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.salta { position: absolute; left: -999px; top: 8px; background: var(--giallo); color: var(--asfalto); padding: 8px 12px; z-index: 10; }
+.salta:focus { left: 8px; }
+:is(a, button, select, input, textarea, summary, [tabindex]):focus-visible { outline: 3px solid var(--giallo); outline-offset: 2px; }
+main:focus, .finale:focus { outline: none; }
+
+header.top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1248px; margin: 0 auto; }
+.brand h1 { font: 800 32px/1.05 var(--font-titoli); margin: 0; }
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+nav.modi { display: flex; flex-wrap: wrap; gap: 4px; }
+nav.modi a { font: 700 15px var(--font-testo); color: var(--fg); text-decoration: none; padding: 6px 12px; border-radius: 999px; box-shadow: inset 0 0 0 2px transparent; }
+nav.modi a:hover { box-shadow: inset 0 0 0 2px var(--linea); }
+nav.modi a[aria-current="page"] { box-shadow: inset 0 0 0 2px var(--fg); }
+.azioni-top { display: flex; gap: 8px; align-items: center; }
+
+.btn { font: 700 17px var(--font-titoli); color: #fff; background: var(--blu-pulsante); border: 0; border-radius: 8px; padding: 10px 18px; box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px var(--blu-pulsante); cursor: pointer; transition: transform .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
 .btn:hover { transform: rotate(-1deg); }
-.btn:focus-visible { outline: 3px solid var(--giallo); outline-offset: 2px; }
-main { display: grid; grid-template-columns: 72px 1fr; gap: 24px; padding: 0 24px 24px; max-width: 1200px; margin: 0 auto; }
-.semaforo { list-style: none; margin: 0; padding: 12px 0; background: var(--asfalto); border-radius: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.luce { width: 36px; height: 36px; border-radius: 50%; background: #444; color: #999; display: grid; place-items: center; font: 700 13px var(--font-testo); }
-.luce[data-accesa="true"] { background: var(--verde); color: #fff; box-shadow: 0 0 16px var(--verde); }
-.scena { background: var(--surface); border-radius: 12px; padding: 24px; min-height: 320px; }
-.didascalia { display: inline-block; background: var(--giallo); color: var(--asfalto); font: 600 17px var(--font-titoli); padding: 8px 12px; }
-.seed { font: 700 13px var(--font-testo); color: var(--muted); }
-@media (max-width: 720px) {
-  header { padding: 16px; }
-  h1 { font-size: 24px; }
-  main { grid-template-columns: 1fr; padding: 0 16px 16px; }
-  .semaforo { flex-direction: row; justify-content: center; padding: 8px; }
-  .luce { width: 24px; height: 24px; font-size: 11px; }
+.btn-sec { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 2px var(--fg); }
+.btn-piccolo { font-size: 15px; padding: 6px 12px; min-height: 40px; }
+.btn-grande { font-size: 20px; padding: 12px 22px; }
+.btn[aria-disabled="true"], .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.freccia { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #fff; color: var(--blu-pulsante); font-size: 18px; }
+.btn small { display: block; font: 400 12px var(--font-testo); opacity: .9; }
+
+main.layout { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 24px; padding: 0 24px 40px; max-width: 1248px; margin: 0 auto; }
+main.layout.senza-semaforo { grid-template-columns: minmax(0, 1fr); }
+.colonna { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.semaforo { list-style: none; margin: 0; padding: 12px 0; background: var(--asfalto); border-radius: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; align-self: start; position: sticky; top: 12px; box-shadow: inset 0 0 0 2px #1d1f22; }
+.luce { width: 38px; height: 38px; border-radius: 50%; background: #454950; color: #C9CCD1; display: grid; place-items: center; font: 700 14px var(--font-testo); transition: background .3s, box-shadow .3s; }
+.luce[data-accesa="true"][data-colore="verde"] { background: var(--verde); color: #10301d; }
+.luce[data-accesa="true"][data-colore="giallo"] { background: var(--giallo); color: var(--asfalto); }
+.luce[data-accesa="true"][data-colore="rosso"] { background: var(--rosso); color: #fff; }
+.luce.corrente { box-shadow: 0 0 0 3px #fff, 0 0 18px 4px rgba(255,255,255,.35); }
+.luce.cede { background: var(--verde) !important; color: #10301d !important; box-shadow: 0 0 0 3px #fff, 0 0 22px 6px var(--verde); }
+
+.intestazione-scena { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.intestazione-scena h2 { margin: 0; }
+.seed { font: 700 14px var(--font-testo); color: var(--muted); }
+.seed button { font: inherit; color: var(--blu); background: none; border: 0; padding: 4px; cursor: pointer; text-decoration: underline; }
+
+.scena-box { position: relative; border-radius: var(--raggio); overflow: hidden; background: #DDE5E0; box-shadow: inset 0 0 0 3px var(--asfalto); }
+.scena-svg { position: relative; aspect-ratio: 2 / 1; }
+.scena-svg svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.fumetti { position: absolute; inset: 0; pointer-events: none; }
+.fumetto-pos { position: absolute; width: max-content; max-width: min(36%, 300px); transform: var(--tx, none); }
+.fumetto-pos.narr { left: 2%; top: 3%; max-width: 50%; }
+.fumetto { position: relative; background: #fff; color: #2E3136; border: 3px solid #2E3136; border-radius: 18px; padding: 8px 14px; font: 600 17px/1.25 var(--font-titoli); animation: pop .22s cubic-bezier(.34,1.56,.64,1) both; }
+.fumetto::after { content: ""; position: absolute; width: 14px; height: 14px; background: inherit; border-right: 3px solid #2E3136; border-bottom: 3px solid #2E3136; bottom: -9px; left: var(--coda, 30%); transform: rotate(45deg); }
+.fumetto .chi { display: block; font: 700 12px var(--font-testo); text-transform: uppercase; letter-spacing: .04em; color: #5F636A; }
+.fumetto[data-tipo="narratore"] { background: var(--giallo); color: #2E3136; border-radius: 0; border-width: 0; box-shadow: 3px 3px 0 #2E3136; font-weight: 600; }
+.fumetto[data-tipo="narratore"]::after, .fumetto[data-tipo="narratore"] .chi { display: none; }
+.fumetto[data-tipo="urlato"] { border-color: #C8322B; border-width: 4px; font-weight: 800; text-transform: uppercase; font-size: 16px; transform: rotate(-1deg); }
+.fumetto[data-tipo="urlato"]::after { border-color: #C8322B; border-width: 0 4px 4px 0; }
+.fumetto[data-tipo="sussurro"] { border-style: dashed; font-style: italic; font-weight: 600; color: #4A4E55; }
+.fumetto[data-tipo="sussurro"]::after { border-style: none dashed dashed none; }
+.fumetto[data-tipo="pensiero"] { border-radius: 40px; font-style: italic; }
+.fumetto[data-tipo="pensiero"]::after { width: 12px; height: 12px; border-radius: 50%; border: 3px solid #2E3136; bottom: -18px; transform: none; box-shadow: 10px 10px 0 -3px #fff, 10px 10px 0 0 #2E3136; }
+.fumetto[data-tipo="sistema"] { border-color: #1F4E9C; border-radius: 6px; box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px #1F4E9C; }
+.fumetto[data-tipo="sistema"]::after { border-color: #1F4E9C; }
+@keyframes pop { 0% { opacity: 0; scale: .6; } 70% { scale: 1.05; } 100% { opacity: 1; scale: 1; } }
+
+.censura { display: inline-block; font: 800 .8em var(--font-titoli); padding: 0 6px; margin: 0 1px; border-radius: 3px; vertical-align: baseline; letter-spacing: .02em; text-transform: none; font-style: normal; }
+.censura[data-intensita="1"] { background: #F2C230; color: #2E3136; }
+.censura[data-intensita="2"] { background: #1B1C1F; color: #F5CD4E; }
+.censura[data-intensita="3"] { background: #C8322B; color: #fff; transform: rotate(-6deg); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #C8322B; animation: trema .2s 2; }
+.censura.aureola { position: relative; }
+.censura.aureola::before { content: ""; position: absolute; left: 20%; right: 20%; top: -7px; height: 4px; border-radius: 50%; border: 2px solid #E0A030; }
+@keyframes trema { 25% { translate: -2px 0; } 75% { translate: 2px 0; } }
+
+.variabili { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.chip { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; padding: 4px 10px 4px 6px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--linea); }
+.chip svg { width: 20px; height: 20px; flex: none; }
+.chip .nome { color: var(--muted); }
+
+.scheda { background: var(--surface); border-radius: var(--raggio); padding: 20px; border-left: 6px solid var(--col-livello, var(--verde)); }
+.scheda[data-colore="verde"] { --col-livello: var(--verde); }
+.scheda[data-colore="giallo"] { --col-livello: var(--giallo); }
+.scheda[data-colore="rosso"] { --col-livello: var(--rosso); }
+.domanda { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
+.domanda legend { font: 700 18px var(--font-testo); margin-bottom: 10px; padding: 0; }
+.opzioni { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 8px; }
+.opzione-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.opzione { min-height: 44px; border-radius: 10px; border: 2px solid var(--fg); background: transparent; color: var(--fg); font: 700 16px var(--font-testo); cursor: pointer; padding: 6px; overflow-wrap: anywhere; }
+.opzione:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.opzione[aria-checked="true"] { background: var(--fg); color: var(--bg); }
+.opzione:disabled { cursor: default; }
+.estremi { display: flex; justify-content: space-between; color: var(--muted); font-size: 14px; margin-top: 4px; }
+.lenti-col { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; min-height: 36px; }
+.lente { width: 34px; height: 34px; border-radius: 50%; background: color-mix(in srgb, var(--fg) 8%, transparent); display: grid; place-items: center; animation: scivola .3s ease-out both; }
+.lente svg { width: 32px; height: 32px; }
+@keyframes scivola { from { opacity: 0; translate: 0 -10px; } }
+.tu { font: 700 12px var(--font-testo); text-align: center; color: var(--fg); }
+.perche { display: grid; gap: 4px; margin-bottom: 16px; }
+.perche label { font-weight: 700; }
+.perche input { font: inherit; padding: 10px 12px; border-radius: 8px; border: 2px solid var(--linea); background: var(--bg); color: var(--fg); width: 100%; }
+.contatore { color: var(--muted); font-size: 13px; text-align: right; }
+.riga-azioni { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.legenda-lenti { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: var(--muted); margin: 0 0 12px; padding: 0; list-style: none; }
+.legenda-lenti li { display: flex; align-items: center; gap: 6px; }
+.legenda-lenti svg { width: 24px; height: 24px; }
+.nota { color: var(--muted); font-size: 14px; }
+
+.intro { background: var(--surface); border-radius: var(--raggio); padding: 28px; display: grid; gap: 12px; }
+.intro .cartello { display: inline-block; align-self: start; justify-self: start; background: var(--giallo); color: var(--asfalto); font: 700 17px var(--font-titoli); padding: 6px 12px; box-shadow: 3px 3px 0 var(--asfalto); }
+
+.finale { display: grid; gap: 20px; min-width: 0; }
+.finale > * { min-width: 0; }
+.timbro { justify-self: start; border: 5px double var(--rosso); color: var(--rosso-testo); font: 800 28px/1.1 var(--font-titoli); letter-spacing: .08em; text-transform: uppercase; padding: 6px 16px; transform: rotate(-4deg); animation: timbro .25s ease-out both; }
+@keyframes timbro { from { opacity: 0; scale: 1.4; rotate: 8deg; } }
+.etichetta { font: 700 20px var(--font-titoli); }
+.avviso-identita { border: 3px solid var(--rosso); padding: 14px 16px; border-radius: 10px; background: var(--surface); }
+.avviso-identita strong { color: var(--rosso-testo); }
+.percorso { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.percorso li { display: grid; grid-template-columns: 36px 1fr; gap: 10px; align-items: start; }
+.percorso .n { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--linea); color: var(--fg); }
+.percorso .n[data-colore="verde"] { background: var(--verde); color: #10301d; }
+.percorso .n[data-colore="giallo"] { background: var(--giallo); color: var(--asfalto); }
+.percorso .n[data-colore="rosso"] { background: var(--rosso); color: #fff; }
+.percorso q { color: var(--muted); font-style: italic; }
+.tabella-wrap { overflow-x: auto; }
+table.confronto { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.confronto th, table.confronto td { padding: 8px 6px; border-bottom: 1px solid var(--linea); text-align: center; }
+table.confronto th:first-child, table.confronto td:first-child { text-align: left; }
+table.confronto td.uguale { color: var(--verde-testo); font-weight: 700; }
+.somiglia { display: flex; gap: 16px; align-items: center; background: var(--surface); padding: 16px; border-radius: var(--raggio); }
+.somiglia svg { width: 72px; height: 120px; flex: none; }
+.pulsanti { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.griglia-2 { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.campi { display: grid; gap: 10px; }
+.campo { display: grid; gap: 4px; }
+.campo label { font-weight: 700; font-size: 15px; }
+.campo select, .campo input[type="text"], .campo textarea { font: inherit; font-size: 16px; padding: 8px 10px; border-radius: 8px; border: 2px solid var(--linea); background: var(--bg); color: var(--fg); width: 100%; }
+.campo textarea { min-height: 80px; resize: vertical; }
+.campo[data-attiva="true"] select { border-color: var(--giallo); box-shadow: 0 0 0 2px var(--giallo); }
+.campo select:disabled { opacity: .55; }
+.grafico svg { width: 100%; height: auto; display: block; }
+.grafico text { font-family: var(--font-testo); fill: var(--fg); }
+
+.schede-pg { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.scheda-pg { display: grid; justify-items: center; gap: 4px; padding: 10px; border-radius: var(--raggio); background: var(--surface); border: 2px solid transparent; color: var(--fg); font: inherit; cursor: pointer; text-align: center; }
+.scheda-pg[aria-pressed="true"] { border-color: var(--fg); }
+.scheda-pg svg { width: 60px; height: 100px; }
+.scheda-pg .titolo { font-size: 13px; color: var(--muted); }
+.cursore { display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: 2px 8px; align-items: center; }
+.cursore label { grid-column: 1 / -1; font-weight: 700; font-size: 15px; }
+.cursore input[type="range"] { width: 100%; accent-color: var(--blu-pulsante); }
+.cursore output { font-variant-numeric: tabular-nums; text-align: right; }
+.anteprima { display: flex; gap: 8px; justify-content: center; background: #DDE5E0; border-radius: var(--raggio); padding: 8px; box-shadow: inset 0 0 0 3px var(--asfalto); }
+.anteprima svg { width: 90px; height: 150px; }
+
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--asfalto); color: var(--gesso); padding: 10px 16px; border-radius: 10px; box-shadow: 0 0 0 2px var(--gesso); opacity: 0; pointer-events: none; transition: opacity .2s; max-width: calc(100vw - 32px); overflow-wrap: anywhere; }
+.toast.visibile { opacity: 1; }
+
+@media (max-width: 900px) {
+  .griglia-2 { grid-template-columns: minmax(0, 1fr); }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@media (max-width: 720px) {
+  header.top { padding: 12px 16px; }
+  .brand h1 { font-size: 24px; }
+  nav.modi a { font-size: 14px; padding: 4px 8px; }
+  main.layout { grid-template-columns: minmax(0, 1fr); padding: 0 16px 32px; gap: 16px; }
+  .semaforo { flex-direction: row; justify-content: center; padding: 8px; position: static; gap: 8px; border-radius: 14px; }
+  .luce { width: 30px; height: 30px; font-size: 12px; }
+  .scena-box { background: var(--surface); }
+  .fumetti { position: static; display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+  .fumetto-pos, .fumetto-pos.narr { position: static; max-width: none; width: auto; transform: none; }
+  .fumetto::after { display: none; }
+  .fumetto { font-size: 16px; }
+  .chip .nome { display: none; }
+  .scheda { padding: 16px; }
+  .opzioni { grid-template-columns: repeat(min(var(--n), 3), minmax(0, 1fr)); }
+  .opzioni[data-tipo="scala"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+@media (min-width: 721px) {
+  .fumetto .chi { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>Chi ha ragione?</h1>
-  <button class="btn" data-testid="btn-nuova" type="button">Nuova grana</button>
+<a class="salta" href="#contenuto">Vai al contenuto</a>
+<header class="top">
+  <div class="brand">
+    <h1>Chi ha ragione?</h1>
+    <p>Il tribunale del marciapiede</p>
+  </div>
+  <nav class="modi" aria-label="Modalità di gioco">
+    <a href="#gioco" data-vista="gioco" data-testid="nav-gioco">Gioco</a>
+    <a href="#laboratorio" data-vista="laboratorio" data-testid="nav-laboratorio">Laboratorio</a>
+    <a href="#indovina" data-vista="indovina" data-testid="nav-indovina">Indovina la lente</a>
+    <a href="#costruisci" data-vista="costruisci" data-testid="nav-costruisci">Costruisci il caso</a>
+    <a href="#personaggi" data-vista="personaggi" data-testid="nav-personaggi">Personaggi</a>
+  </nav>
+  <div class="azioni-top">
+    <button class="btn btn-sec btn-piccolo" type="button" data-azione="tema" data-testid="btn-tema" title="Cambia tema"><span aria-hidden="true">◐</span> Tema: <span data-tema-etichetta>Auto</span></button>
+    <button class="btn" type="button" data-azione="nuova" data-testid="btn-nuova">Nuova grana</button>
+  </div>
 </header>
-<main>
-  <ol class="semaforo" aria-label="Semaforo dell'escalation"></ol>
-  <section class="scena" data-testid="scena" aria-live="polite">
-    <p class="didascalia" data-testid="didascalia">Tutto tranquillo. Per ora.</p>
-    <p class="seed" data-testid="seed"></p>
-  </section>
-</main>
+<main id="contenuto" class="layout" tabindex="-1"></main>
+<div class="sr-only" aria-live="polite" data-testid="annunci"></div>
+<div class="toast" role="status" aria-live="polite" data-testid="toast"></div>
 <script id="motore">
 globalThis.Motore = (() => {
-  const LIVELLI = ["La scena", "Il fastidio", "La richiesta", "La risposta", "Dopo il rifiuto", "Lo scontro", "La chiusura"];
-  const LUOGHI = ["Parco", "Piazza affollata", "Fermata dell'autobus", "Treno regionale", "Ristorante", "Bar", "Palestra", "Cinema", "Biblioteca", "Sagrato della chiesa", "Live in streaming"];
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const r3 = v => Math.round(v * 1000) / 1000;
+  const cap = s => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
   function mulberry32(a) {
     return function () {
@@ -73,51 +256,1766 @@ globalThis.Motore = (() => {
       return ((t ^ t >>> 14) >>> 0) / 4294967296;
     };
   }
-
-  function generaSituazione(seed) {
-    const rnd = mulberry32(seed);
-    return { seed, luogo: LUOGHI[Math.floor(rnd() * LUOGHI.length)] };
+  const pick = (rnd, arr) => arr[Math.floor(rnd() * arr.length)];
+  function pesato(rnd, items, pesi) {
+    const tot = pesi.reduce((a, b) => a + b, 0);
+    if (tot <= 0) return items[0];
+    let r = rnd() * tot;
+    for (let i = 0; i < items.length; i++) {
+      r -= pesi[i];
+      if (r < 0) return items[i];
+    }
+    return items[items.length - 1];
   }
 
-  return Object.freeze({ LIVELLI, LUOGHI, mulberry32, generaSituazione });
+  const LIVELLI = ["La scena", "Il fastidio", "La richiesta", "La risposta", "Dopo il rifiuto", "Lo scontro", "La chiusura"];
+
+  const TRATTI = ["sensibilita_religiosa", "sensibilita_generica", "propensione_a_chiedere", "cortesia", "testardaggine", "fastidio_intromissioni", "rispetto_contesto", "uso_bestemmia"];
+  const NOMI_TRATTI = {
+    sensibilita_religiosa: "Sensibilità religiosa",
+    sensibilita_generica: "Sensibilità generica",
+    propensione_a_chiedere: "Propensione a chiedere",
+    cortesia: "Cortesia",
+    testardaggine: "Testardaggine",
+    fastidio_intromissioni: "Fastidio per le intromissioni",
+    rispetto_contesto: "Rispetto del contesto",
+    uso_bestemmia: "Uso della bestemmia",
+  };
+  const t = (...v) => Object.fromEntries(TRATTI.map((k, i) => [k, v[i]]));
+
+  const PERSONAGGI = [
+    {
+      id: "marco", nome: "Marco", titolo: "il diplomatico ateo", principale: true,
+      descrizione: "Ateo, critico verso la religione e favorevole a uno Stato molto laico, ma preferisce non urtare la sensibilità altrui senza motivo. Pensa che nel conflitto la responsabilità sia condivisa.",
+      lente: "Se potevi evitarlo a costo zero, dovevi evitarlo.",
+      tratti: t(0.1, 0.7, 0.5, 0.8, 0.5, 0.3, 0.9, 0.05),
+      avatar: { corpo: 1, distintivo: "maglione", colore: "#4A7A8C", pelle: "#E0B48F", capelli: "#3B2A20", taglio: "corti" },
+    },
+    {
+      id: "luca", nome: "Luca", titolo: "il credente aperto", principale: true,
+      descrizione: "Evangelico, tollerante e disposto al dialogo, ma le bestemmie lo feriscono davvero. Non vuole leggi che le puniscano, preferisce la buona educazione.",
+      lente: "Per chi crede è come insultare qualcuno di caro.",
+      tratti: t(0.85, 0.5, 0.4, 0.9, 0.3, 0.3, 0.85, 0),
+      avatar: { corpo: 1, distintivo: "giacca", colore: "#7A5C99", pelle: "#F1D3B8", capelli: "#6B4A2B", taglio: "corti" },
+    },
+    {
+      id: "gigi", nome: "Gigi", titolo: "il mediatore", principale: true,
+      descrizione: "Cresciuto in una famiglia molto cattolica, oggi indifferente alle bestemmie. Vede le ragioni di tutti, sdrammatizza con le battute e cerca un terzo che faccia da arbitro.",
+      lente: "Uno dei due deve abbozzare, decidiamo chi.",
+      tratti: t(0.15, 0.4, 0.3, 0.8, 0.2, 0.4, 0.7, 0.1),
+      avatar: { corpo: 2, distintivo: "cappello", colore: "#D9822B", pelle: "#C08A63", capelli: "#2E2E2E", taglio: "corti" },
+    },
+    {
+      id: "sara", nome: "Sara", titolo: "la linguista", principale: true,
+      descrizione: "Vede la bestemmia come fenomeno linguistico e sociale. Bestemmia abitualmente, ma si modera con chi sa che ne soffre. Non sopporta che estranei si intromettano in una conversazione privata.",
+      lente: "Il rispetto lo devo al mio interlocutore, non a chi ascolta per caso.",
+      tratti: t(0, 0.5, 0.35, 0.6, 0.75, 0.95, 0.7, 0.7),
+      avatar: { corpo: 0, distintivo: "occhiali", colore: "#2E8C83", pelle: "#F1D3B8", capelli: "#A0522D", taglio: "lunghi" },
+    },
+    {
+      id: "ettore", nome: "Ettore", titolo: "l'anticlericale radicale", principale: true,
+      descrizione: "Ex credente, oggi fortemente contrario alla tutela speciale del sentimento religioso. Considera ogni richiesta di non bestemmiare una pretesa mascherata da educazione. Si modera solo davanti ai bambini.",
+      lente: "Perché il sentimento religioso dovrebbe valere più di quello politico?",
+      tratti: t(0, 0.4, 0.3, 0.4, 0.9, 0.8, 0.4, 0.85),
+      avatar: { corpo: 2, distintivo: "giubbotto", colore: "#8C2E2E", pelle: "#E0B48F", capelli: "#8A8A8A", taglio: "calvo" },
+    },
+    {
+      id: "rosa", nome: "Nonna Rosa", titolo: "la devota",
+      descrizione: "Cattolica praticante, anziana, abituata a un linguaggio pulito. Chiede con garbo, ma chiede.",
+      lente: "Una volta certe cose non si dicevano.",
+      tratti: t(0.95, 0.6, 0.6, 0.9, 0.5, 0.3, 0.9, 0),
+      avatar: { corpo: 1, distintivo: "foulard", colore: "#C77D9A", pelle: "#F1D3B8", capelli: "#DDDDDD", taglio: "raccolti" },
+    },
+    {
+      id: "karim", nome: "Karim", titolo: "il praticante riservato",
+      descrizione: "Musulmano praticante, riservato, molto sensibile alle offese verso la fede. Raramente chiede, ma quando lo fa è sincero.",
+      lente: "Rispetto chiedo, rispetto do.",
+      tratti: t(0.95, 0.5, 0.3, 0.85, 0.4, 0.4, 0.9, 0),
+      avatar: { corpo: 1, distintivo: "kufi", colore: "#3D6E4E", pelle: "#8E5C3C", capelli: "#1E1E1E", taglio: "corti" },
+    },
+    {
+      id: "giulia", nome: "Giulia", titolo: "la madre con due bambini",
+      descrizione: "Non religiosa, ma attenta a ciò che sentono i figli. Compare solo quando ci sono bambini.",
+      lente: "Prima di tutto, cosa sentono i bambini.",
+      tratti: t(0.2, 0.8, 0.7, 0.7, 0.5, 0.4, 0.8, 0.1),
+      vincoli: { bambini: true },
+      avatar: { corpo: 1, distintivo: "passeggino", colore: "#E0A030", pelle: "#C08A63", capelli: "#4A2E1E", taglio: "lunghi" },
+    },
+    {
+      id: "teo", nome: "Teo", titolo: "l'intercalare",
+      descrizione: "Bestemmia per abitudine regionale, senza intento offensivo. Se glielo fai notare, spesso cade dalle nuvole.",
+      lente: "Ma è un modo di dire!",
+      tratti: t(0.1, 0.3, 0.2, 0.7, 0.3, 0.5, 0.5, 0.9),
+      avatar: { corpo: 0, distintivo: "cuffie", colore: "#5A7FBF", pelle: "#E0B48F", capelli: "#C9A227", taglio: "ricci" },
+    },
+    {
+      id: "vale", nome: "Vale", titolo: "l'ipersensibile",
+      descrizione: "Infastidita da qualsiasi rumore o volgarità. Chiede spesso e non sempre con gentilezza.",
+      lente: "Il silenzio è un diritto. Il mio.",
+      tratti: t(0.3, 0.95, 0.9, 0.5, 0.6, 0.5, 0.6, 0.05),
+      avatar: { corpo: 0, distintivo: "mascherina", colore: "#9AA5B1", pelle: "#5E3B26", capelli: "#1E1E1E", taglio: "corti" },
+    },
+    {
+      id: "dario", nome: "Dario", titolo: "il provocatore",
+      descrizione: "Bestemmia apposta per vedere chi reagisce. Più ti offendi, più si diverte.",
+      lente: "Più si offendono, più mi diverto.",
+      tratti: t(0, 0.2, 0.3, 0.1, 0.95, 0.9, 0.1, 0.9),
+      avatar: { corpo: 1, distintivo: "occhiali_sole", colore: "#222222", pelle: "#F1D3B8", capelli: "#2E2E2E", taglio: "corti" },
+    },
+    {
+      id: "gestore", nome: "Il gestore", titolo: "il terzo con autorità", ruolo: "terzo",
+      descrizione: "Entra solo come arbitro nei luoghi regolati e applica le regole del posto.",
+      lente: "Il regolamento è il regolamento.",
+      tratti: t(0.3, 0.5, 0.5, 0.7, 0.5, 0.3, 0.9, 0),
+      avatar: { corpo: 2, distintivo: "badge", colore: "#1F4E9C", pelle: "#C08A63", capelli: "#4A4A4A", taglio: "corti" },
+    },
+  ].map(p => ({ esasperazione: 1, voce: p.id, ...p }));
+
+  const LUOGHI = [
+    { id: "parco", nome: "Parco", frase: "Parco", allontanarsi: 0.9, durata: 0.2, regolato: false, silenzio: 0.2, seduti: true, pubblico: [2, 5, 2],
+      intro: ["Parco. Un piccione osserva la scena con aria giudicante.", "Parco. Panchine, foglie e una calma che durerà poco.", "Parco. Qualcuno fa jogging, qualcuno fa polemica."] },
+    { id: "piazza", nome: "Piazza affollata", frase: "Piazza", allontanarsi: 0.9, durata: 0.2, regolato: false, silenzio: 0.2, seduti: false, pubblico: [0, 2, 6],
+      intro: ["Piazza affollata. La statua al centro ha visto di peggio. Forse.", "Piazza affollata. Cento persone, zero privacy.", "Piazza affollata. Il brusio copre quasi tutto. Quasi."] },
+    { id: "fermata", nome: "Fermata dell'autobus", frase: "Fermata dell'autobus", allontanarsi: 0.5, durata: 0.2, regolato: false, silenzio: 0.2, seduti: false, pubblico: [2, 5, 1],
+      intro: ["Fermata dell'autobus. Il display dice: IN ARRIVO, forse.", "Fermata dell'autobus. L'autobus è in ritardo. Anche la pazienza.", "Fermata dell'autobus. Tutti fissano la strada come se servisse."] },
+    { id: "treno", nome: "Treno regionale", frase: "Treno regionale", allontanarsi: 0.2, durata: 0.9, regolato: true, terzo: "il capotreno", silenzio: 0.5, seduti: true, pubblico: [1, 5, 2],
+      intro: ["Treno regionale. Ritardo previsto: 40 minuti. Vie di fuga: nessuna.", "Treno regionale. Il climatizzatore ha deciso di scioperare.", "Treno regionale. Prossima fermata: tra moltissimo."] },
+    { id: "ristorante", nome: "Ristorante", frase: "Ristorante", allontanarsi: 0.2, durata: 0.9, regolato: true, terzo: "il gestore", silenzio: 0.5, seduti: true, pubblico: [1, 5, 2],
+      intro: ["Ristorante. Il cameriere fa finta di non sentire. È il suo superpotere.", "Ristorante. Tovaglie a quadri e tavoli troppo vicini.", "Ristorante. Il secondo tarda, la tensione no."] },
+    { id: "bar", nome: "Bar", frase: "Bar", allontanarsi: 0.5, durata: 0.5, regolato: true, terzo: "il barista", silenzio: 0.2, seduti: false, pubblico: [1, 5, 2],
+      intro: ["Bar. Sulla lavagna c'è scritto: oggi, polemica del giorno.", "Bar. La macchina del caffè sbuffa. Non è l'unica.", "Bar. Bancone, cornetti e opinioni non richieste."] },
+    { id: "palestra", nome: "Palestra", frase: "Palestra", allontanarsi: 0.5, durata: 0.5, regolato: true, terzo: "l'istruttrice", silenzio: 0.2, seduti: false, pubblico: [1, 5, 1],
+      intro: ["Palestra. Poster motivazionale: NO PAIN, NO RAGIONE.", "Palestra. Manubri, specchi e ego in allenamento.", "Palestra. Si sollevano pesi. E sopracciglia."] },
+    { id: "cinema", nome: "Cinema", frase: "Cinema", allontanarsi: 0, durata: 0.9, regolato: true, terzo: "la maschera", silenzio: 0.9, seduti: true, pubblico: [0, 3, 4],
+      intro: ["Cinema. Il film non è ancora iniziato. Il dramma sì.", "Cinema. Sullo schermo: SSSHHH. In sala: tutto il contrario.", "Cinema. Poltrone strette, pazienza ancora di più."] },
+    { id: "biblioteca", nome: "Biblioteca", frase: "Biblioteca", allontanarsi: 0.5, durata: 0.9, regolato: true, terzo: "la bibliotecaria", silenzio: 0.9, seduti: true, pubblico: [1, 5, 1],
+      intro: ["Biblioteca. Il cartello SILENZIO è leggermente storto. Come l'umore.", "Biblioteca. Si sente volare una mosca. E non solo.", "Biblioteca. Scaffali, lampade verdi e nervi tesi."] },
+    { id: "sagrato", nome: "Sagrato della chiesa", frase: "Sagrato della chiesa", allontanarsi: 0.9, durata: 0.2, regolato: false, silenzio: 0.5, seduti: false, pubblico: [1, 5, 2],
+      intro: ["Sagrato della chiesa. La campana osserva con gli occhi socchiusi.", "Sagrato della chiesa. È appena finita la messa delle undici.", "Sagrato della chiesa. Gradini, piccioni e un certo senso di solennità."] },
+    { id: "live", nome: "Live in streaming", frase: "Live in streaming", allontanarsi: 1, durata: 0.5, regolato: true, terzo: "la moderatrice", silenzio: 0.2, seduti: true, pubblico: [0, 1, 5],
+      intro: ["Live in streaming. In chat qualcuno ha già scritto RAGA.", "Live in streaming. Spettatori collegati: tanti. Freno inibitore: poco.", "Live in streaming. Il microfono è aperto. Purtroppo."] },
+  ];
+
+  const CONDOTTE = [
+    { id: "bestemmia_singola", nome: "Bestemmia singola", tipo: "linguaggio", evitabile: true, danno_oggettivo: false, religiosa: true, intensita: 0.6, peso: 3,
+      etichetta: "una bestemmia", cosa: "evitare le bestemmie", azione: "bestemmiare in pubblico", imp: "smettila di bestemmiare", concreta: "smettere", breve: "bestemmie" },
+    { id: "bestemmie_ripetute", nome: "Bestemmie ripetute", tipo: "linguaggio", evitabile: true, danno_oggettivo: false, religiosa: true, intensita: 0.85, peso: 2,
+      etichetta: "una bestemmia dopo l'altra", cosa: "evitare le bestemmie", azione: "bestemmiare così", imp: "basta con le bestemmie", concreta: "smettere", breve: "bestemmie" },
+    { id: "turpiloquio", nome: "Turpiloquio senza bestemmie", tipo: "linguaggio", evitabile: true, danno_oggettivo: false, religiosa: false, intensita: 0.5, peso: 1.5,
+      etichetta: "parolacce a raffica", cosa: "moderare il linguaggio", azione: "parlare così", imp: "basta parolacce", concreta: "smettere", breve: "parolacce" },
+    { id: "offesa_gruppo", nome: "Parola offensiva verso un gruppo", tipo: "linguaggio", evitabile: true, danno_oggettivo: false, religiosa: false, colpisce_persone: true, intensita: 0.85, peso: 1,
+      etichetta: "un insulto verso un gruppo di persone", cosa: "non usare quella parola", azione: "insultare la gente così", imp: "rimangiati quella parola", concreta: "smettere", breve: "insulti" },
+    { id: "critica_religione", nome: "Critica alla religione", tipo: "opinione", evitabile: true, danno_oggettivo: false, religiosa: true, intensita: 0.5, peso: 1.2,
+      etichetta: "una critica feroce alla religione", cosa: "cambiare argomento", azione: "parlare così della fede degli altri", imp: "cambia argomento", concreta: "cambiare argomento", breve: "prediche al contrario" },
+    { id: "politica", nome: "Parlare di politica", tipo: "opinione", evitabile: true, danno_oggettivo: false, religiosa: false, intensita: 0.35, peso: 1,
+      etichetta: "un comizio politico improvvisato", cosa: "cambiare argomento", azione: "fare comizi qui", imp: "basta con la politica", concreta: "cambiare argomento", breve: "comizi" },
+    { id: "fumare", nome: "Fumare vicino", tipo: "comportamento", evitabile: true, danno_oggettivo: true, religiosa: false, intensita: 0.9, peso: 1.2,
+      etichetta: "una sigaretta accesa", cosa: "spostarti un po' per fumare", azione: "fumare addosso alla gente", imp: "spegni quella sigaretta", concreta: "spostarsi", breve: "fumo" },
+    { id: "musica", nome: "Musica o video senza cuffie", tipo: "comportamento", evitabile: true, danno_oggettivo: false, religiosa: false, intensita: 0.7, peso: 1.2, volume: true,
+      etichetta: "musica dal telefono senza cuffie", cosa: "mettere le cuffie", azione: "tenere la musica a tutto volume", imp: "abbassa quella musica", concreta: "abbassare la voce", breve: "musica a palla" },
+    { id: "telefonata", nome: "Telefonata a voce alta", tipo: "comportamento", evitabile: true, danno_oggettivo: false, religiosa: false, intensita: 0.6, peso: 1.2, volume: true,
+      etichetta: "una telefonata in vivavoce", cosa: "parlare un po' più piano", azione: "telefonare urlando", imp: "abbassa la voce", concreta: "abbassare la voce", breve: "vivavoce" },
+    { id: "mangiare", nome: "Mangiare rumorosamente", tipo: "comportamento", evitabile: "in parte", danno_oggettivo: false, religiosa: false, intensita: 0.4, peso: 0.8,
+      etichetta: "un panino masticato a bocca aperta", cosa: "masticare un po' più piano", azione: "mangiare così rumorosamente", imp: "mastica a bocca chiusa", concreta: "smettere", breve: "masticazione rumorosa" },
+    { id: "odore", nome: "Odore corporeo", tipo: "condizione", evitabile: "dipende", danno_oggettivo: false, religiosa: false, intensita: 0.5, peso: 0.6,
+      etichetta: "un odore piuttosto deciso", cosa: "spostarti un pochino", azione: "presentarsi così in mezzo alla gente", imp: "spostati un po' più in là", concreta: "spostarsi", breve: "odori" },
+    { id: "lingua_madre", nome: "Parlare la propria lingua madre", tipo: "identita", evitabile: false, danno_oggettivo: false, religiosa: false, identita: true, intensita: 0.3, peso: 0.7,
+      etichetta: "una conversazione in un'altra lingua", cosa: "parlare in italiano", azione: "parlare in un'altra lingua", imp: "parla italiano", concreta: "smettere", breve: "lingue straniere" },
+    { id: "mano", nome: "Coppia che si tiene per mano", tipo: "identita", evitabile: false, danno_oggettivo: false, religiosa: false, identita: true, intensita: 0.25, peso: 0.7,
+      etichetta: "una coppia che si tiene per mano", cosa: "evitare certe effusioni", azione: "fare così in pubblico", imp: "smettetela di tenervi per mano", concreta: "smettere", breve: "effusioni" },
+  ];
+
+  const MODULATORI = {
+    volume: { nome: "Volume", valori: ["basso", "normale", "alto", "urlato"], pesi: [2, 4, 3, 1] },
+    frequenza: { nome: "Frequenza", valori: ["una volta", "alcune volte", "continua"], pesi: [4, 3, 2] },
+    intento: { nome: "Intento", valori: ["intercalare", "sfogo", "battuta", "provocazione", "offesa mirata"], pesi: [4, 3, 3, 1, 1] },
+    destinatario: { nome: "Destinatario", valori: ["agli amici", "a nessuno", "a chi ascolta"], pesi: [5, 3, 1] },
+    bambini: { nome: "Bambini", valori: ["no", "sì, lontani", "sì, vicini"], pesi: [5, 2, 2] },
+    rapporto: { nome: "Rapporto", valori: ["sconosciuti", "conoscenti di vista", "colleghi", "amici"], pesi: [6, 2, 1, 1] },
+    religione: { nome: "Religione dei presenti", valori: ["nota", "ipotizzata", "ignota"], pesi: [2, 3, 5] },
+    pubblico: { nome: "Pubblico", valori: ["nessuno", "poche persone", "folla"], pesi: [2, 5, 2] },
+  };
+
+  const DRAMMATICITA = 2.4;
+  const STILI = ["gentile", "neutro", "secco", "aggressivo"];
+  const BONUS_STILE = { gentile: 1.3, neutro: 1, secco: 0.7, aggressivo: 0.4 };
+  const FORME = ["domanda", "affermazione", "ordine"];
+  const MOTIVAZIONI = ["nessuna", "fastidio", "fede", "bambini", "regole"];
+  const CONCRETE = ["smettere", "abbassare la voce", "spostarsi", "cambiare argomento"];
+
+  const TEMPLATE = {
+    scena: {
+      bestemmia_singola: {
+        narra: ["{autore} sta raccontando qualcosa a {amici} e a un certo punto scappa una bestemmia.", "{autore} legge un messaggio sul telefono e commenta a voce alta.", "{autore} inciampa e la prende con filosofia. Più o meno."],
+        battuta: ["E niente, alla fine mi hanno cambiato turno. [bestemmia]!", "Ma è possibile? Di nuovo in ritardo, [bestemmia]!", "Ahia! [bestemmia], che botta al mignolo."],
+      },
+      bestemmie_ripetute: {
+        narra: ["{autore} racconta a {amici} la settimana lavorativa. Con molta, molta enfasi.", "{autore} perde a una partita sul telefono. E poi la riperde.", "{autore} sta montando un mobile svedese. Mentalmente."],
+        battuta: ["[bestemmia], il capo mi richiama. [bestemmia]! Di sabato! [bestemmia]!", "Di nuovo! [bestemmia]! E ancora! [bestemmia]!", "Allora: vite A nel foro B. [bestemmia]. Foro B? [bestemmia]!"],
+      },
+      turpiloquio: {
+        narra: ["{autore} racconta a {amici} del vicino di casa, senza filtri.", "{autore} commenta la partita di ieri con un lessico molto colorito.", "{autore} parla del traffico. E il traffico ne esce male."],
+        battuta: ["Quel [parolaccia] del mio vicino ha parcheggiato di nuovo davanti al cancello!", "Arbitro [parolaccia], rigore netto, ma che [parolaccia] fischiava?", "Un'ora in tangenziale, ma che [parolaccia] di città!"],
+      },
+      offesa_gruppo: {
+        narra: ["{autore} commenta una notizia sul telefono a voce alta.", "{autore} racconta a {amici} una storia, generalizzando parecchio.", "{autore} si lamenta del quartiere con {amici}."],
+        battuta: ["Eh, ma quelli sono tutti dei [insulto], si sa.", "Tipico dei [insulto], guarda.", "Da quando ci sono i [insulto], qui non si vive più."],
+      },
+      critica_religione: {
+        narra: ["{autore} spiega a {amici} cosa pensa della religione. Ci tiene molto.", "{autore} ha appena finito un libro di filosofia e ha tante cose da dire.", "{autore} commenta un servizio del telegiornale."],
+        battuta: ["Secondo me la religione è una favola per adulti, e pure scritta male.", "Ma dai, nel ventunesimo secolo credere ancora ai miracoli?", "Tutte le religioni sono uguali: tante regole e poca logica."],
+      },
+      politica: {
+        narra: ["{autore} tiene un comizio improvvisato davanti a {amici}.", "{autore} ha letto un titolo e ha già un'opinione definitiva.", "{autore} spiega a {amici} come si governa un paese. In cinque minuti."],
+        battuta: ["Te lo dico io: ci vorrebbe uno che mette tutti in riga. Tutti!", "Le tasse? Un furto legalizzato. E lo dico con affetto.", "Il problema di questo paese sono quelli che votano gli altri."],
+      },
+      fumare: {
+        narra: ["{autore} si accende una sigaretta. Il vento porta il fumo dritto verso {osservatore}.", "{autore} fuma con grande soddisfazione. La nuvola si allarga.", "{autore} si accende la terza sigaretta in dieci minuti."],
+        battuta: ["Una sola, giuro, poi smetto. Da lunedì.", "Ah, ci voleva proprio.", "Che giornata. Almeno questa me la godo."],
+      },
+      musica: {
+        narra: ["{autore} fa sentire un pezzo a {amici}. Lo sente anche il resto della zona.", "{autore} guarda video sul telefono, volume al massimo.", "{autore} ha scoperto un nuovo artista e vuole condividerlo con il mondo."],
+        battuta: ["Senti questo pezzo! Aspetta che alzo.", "Questo video è troppo forte, guarda qua!", "Il ritornello arriva adesso, ascolta!"],
+      },
+      telefonata: {
+        narra: ["{autore} risponde al telefono in vivavoce.", "{autore} è in videochiamata con mezzo parentado.", "{autore} parla al telefono come se l'altro fosse in un'altra regione. Lo è."],
+        battuta: ["Pronto? Sì, ti ho in vivavoce! No, non c'è nessuno, parla pure!", "Mamma? Mi senti? NON TI SENTO!", "Sì, sono qui! Ti racconto tutto, mettiti comodo."],
+      },
+      mangiare: {
+        narra: ["{autore} addenta un panino con l'entusiasmo di una betoniera.", "{autore} sgranocchia patatine, una alla volta, con grande impegno.", "{autore} mangia una mela. Si sente fino in fondo."],
+        battuta: ["Mmh, questo panino con la cipolla è una poesia.", "Scusate, ho una fame che non vi dico.", "Ne volete? No? Meglio."],
+      },
+      odore: {
+        narra: ["{autore} è appena uscito da una lunga giornata. Molto lunga. E si sente.", "{autore} arriva dalla palestra, senza passare dalla doccia.", "Intorno a {autore} si forma un cerchio di aria piuttosto intensa."],
+        battuta: ["Che giornata, ragazzi. Sono a pezzi.", "Dieci chilometri a piedi oggi, record personale!", "Fa caldissimo, vero?"],
+      },
+      lingua_madre: {
+        narra: ["{autore} chiacchiera con {amici} nella propria lingua madre, ridendo.", "{autore} telefona alla nonna nella lingua di casa.", "{autore} racconta una barzelletta a {amici} in un'altra lingua."],
+        battuta: ["(in un'altra lingua) ...e poi gliel'ho detto, capisci? Ahahah!", "(in un'altra lingua) Sì, nonna, mangio. Sì, tutti i giorni.", "(in un'altra lingua) E il cammello gli risponde... ahahah!"],
+      },
+      mano: {
+        narra: ["{autore} e {amico} si tengono per mano e si raccontano la giornata.", "{autore} e {amico} passeggiano mano nella mano.", "{autore} e {amico} si sorridono, mano nella mano."],
+        battuta: ["Dai, stasera cucino io. Prometto: niente bruciato.", "Ti ricordi il primo appuntamento? Pioveva a dirotto.", "Domenica andiamo al mare?"],
+      },
+    },
+    fastidio: {
+      sopporta: {
+        narra: ["{osservatore} alza gli occhi al cielo ma non dice niente.", "{osservatore} sospira profondamente. Molto profondamente. Ma resta in silenzio.", "{osservatore} fa finta di niente. Ha anni di allenamento."],
+        pensiero: ["Lascia stare, non ne vale la pena.", "Respira. Conta fino a dieci. Anzi, fino a venti.", "Non è affar mio. Credo."],
+      },
+      allontana: {
+        narra: ["{osservatore} sospira, prende le sue cose e si sposta qualche metro più in là.", "{osservatore} cambia posto senza dire una parola. Il messaggio però arriva forte e chiaro.", "{osservatore} si alza e va altrove. Strategia antica: la ritirata dignitosa."],
+        pensiero: ["Vado io, così almeno non discuto.", "Ci sono posti più tranquilli al mondo.", "Ok, cambio aria."],
+      },
+      chiede: {
+        narra: ["{osservatore} si irrigidisce. Si vede che sta per dire qualcosa.", "{osservatore} si gira lentamente verso {autore}.", "{osservatore} prende un bel respiro. Ha deciso: parlerà."],
+        pensiero: ["Adesso glielo dico. Con calma. Con molta calma.", "Possibile che nessuno dica niente?", "Ok. Tocca a me."],
+      },
+    },
+    richiesta: {
+      apertura: {
+        gentile: ["Scusa se mi intrometto, ", "Scusate, ", "Perdona il disturbo, "],
+        neutro: ["Senti, ", "Ehi, ", ""],
+        secco: ["Senti, ", "Basta, eh. ", "Ok, adesso basta. "],
+        aggressivo: ["Ma vi sembra il modo? ", "Ma siete seri? ", "Oh, ma ti rendi conto? "],
+      },
+      corpo: {
+        domanda: ["potresti {cosa}?", "ti dispiacerebbe {cosa}?", "riusciresti a {cosa}?"],
+        affermazione: ["qui non si dovrebbe {azione}.", "questo non è il posto per {azione}.", "{azione} qui non va bene."],
+        ordine: ["{imp}!", "{imp}, grazie!", "{imp}. Subito."],
+      },
+      motivo: {
+        nessuna: [""],
+        fastidio: [" Mi dà fastidio.", " Mi sta dando parecchio fastidio."],
+        fede: [" Sono credente e mi fa male sentirlo.", " Per chi crede è pesante, sai?"],
+        bambini: [" Ci sono dei bambini.", " Ci sono dei bambini qui, eh."],
+        regole: [" Qui ci sarebbe un regolamento.", " Ci sono delle regole, qui."],
+      },
+      reazione_amici: ["Oh-oh.", "Ecco, lo sapevo.", "Qualcuno ha dei popcorn?"],
+    },
+    risposta: {
+      accetta: ["Hai ragione, scusa, non ci avevo fatto caso.", "Ops, scusa. Non me ne ero accorto.", "Ok, nessun problema. Scusami."],
+      accetta_a_meta: ["Ok, abbasso la voce, ma non stavo parlando con te.", "Va bene, mi modero. Un pochino.", "Faccio piano, ma il problema ce l'hai tu, eh."],
+      rifiuta_gentile: ["Capisco, ma sto parlando con i miei amici, non ti sto disturbando apposta.", "Mi dispiace, ma non credo di fare niente di male.", "Rispetto il tuo punto di vista, ma continuo come prima."],
+      rifiuta_sgarbato: ["Fatti i fatti tuoi, non sto parlando con te.", "E tu chi saresti, il vigile del galateo?", "Se non ti piace, c'è tanto spazio intorno."],
+      accetta_identita: ["Ok... va bene, la smetto.", "Va bene. Scusa se esisto.", "D'accordo, ci starò attento. Che tristezza, però."],
+      rifiuta_gentile_identita: ["Sto solo essendo me stesso. Non c'è niente da smettere.", "Capisco che ti stupisca, ma è la mia vita, non uno spettacolo.", "Non ti sto facendo niente: esisto e basta."],
+      rifiuta_sgarbato_identita: ["Davvero mi stai chiedendo di essere diverso? Ma per favore.", "Il problema qui non sono io, fidati.", "Ah sì? E poi cosa, mi chiedi di trasferirmi su Marte?"],
+      ringrazia: ["Grazie, davvero.", "Grazie, apprezzo.", "Grazie mille, sul serio."],
+      chiusura_pace: ["E la pace tornò a regnare. Per ora.", "Crisi diplomatica evitata. Il piccione è deluso.", "Tutto risolto in dieci secondi. Un record."],
+    },
+    dopo: {
+      accetta_no: {
+        osservatore: ["Va bene, come vuoi.", "Ok, ci ho provato.", "Ricevuto. Mi rassegno."],
+        narra: ["{osservatore} incassa il no con dignità. O quasi.", "{osservatore} lascia perdere. La giornata è lunga.", "{osservatore} decide che non vale la pena insistere."],
+      },
+      si_allontana: {
+        osservatore: ["Incredibile.", "Che gente...", "Bah."],
+        narra: ["{osservatore} raccoglie le sue cose e si sposta altrove, borbottando.", "{osservatore} se ne va scuotendo la testa.", "{osservatore} cambia posto con un sospiro teatrale."],
+      },
+      insiste: {
+        osservatore: ["No, scusa, ma non è normale. {Imp}!", "Te lo chiedo un'altra volta: {cosa}, per favore.", "Guarda che non lo dico solo io, eh!"],
+        narra: ["{osservatore} non molla.", "{osservatore} rilancia. La temperatura sale.", "{osservatore} incrocia le braccia e insiste."],
+      },
+      chiama_terzo: {
+        osservatore: ["Adesso chiamo {terzo}, così vediamo chi ha ragione.", "Scusi! Può venire un attimo?", "Va bene, decide {terzo}."],
+        narra: ["{osservatore} va a cercare {terzo}.", "{osservatore} fa un cenno a {terzo}.", "{osservatore} alza la mano per chiamare {terzo}."],
+      },
+    },
+    scontro: {
+      cede_autore: {
+        autore: ["Va bene, va bene! La smetto. Va bene così?", "Ok, hai vinto tu. Ma sappi che non sono d'accordo.", "Uffa. Va bene. Per stavolta."],
+        narra: ["{autore} cede, più per stanchezza che per convinzione.", "{autore} alza le mani in segno di resa.", "{autore} sbuffa, ma smette."],
+      },
+      cede_osservatore: {
+        osservatore: ["Lasciamo perdere, non ne vale la pena.", "Ok, hai vinto tu. Me ne faccio una ragione.", "Basta, rinuncio. Buona giornata."],
+        narra: ["{osservatore} getta la spugna.", "{osservatore} decide che la propria pace vale più della ragione.", "{osservatore} si arrende con un sorriso tirato."],
+      },
+      battuta: {
+        battuta: ["Ragazzi, facciamo così: ognuno abbassa i toni del dieci per cento e siamo tutti contenti?", "Se continuate così vi chiamano per un reality.", "Pausa caffè? Offro io. Pace fatta?"],
+        narra: ["La battuta funziona. Qualcuno ride e la tensione scende.", "Risata generale. Anche i più arrabbiati si sciolgono un po'.", "Un sorriso scappa a tutti. Fine delle ostilità."],
+      },
+      insulti: {
+        autore: ["Ma chi ti credi di essere?!", "Ma senti questo [insulto]!", "Vai a fare la morale altrove!"],
+        osservatore: ["Maleducazione allo stato puro!", "Ma guarda che [insulto]!", "Non ho mai visto una cosa del genere!"],
+        narra: ["I toni salgono. Tutti intorno fanno finta di guardare il telefono.", "Volano parole grosse. Il piccione si allontana per prudenza.", "La discussione diventa un duello di urla."],
+      },
+      attesa_terzo: {
+        autore: ["Ma guarda tu...", "Adesso pure l'arbitro.", "Che esagerazione."],
+        narra: ["Mentre arriva {terzo}, i due si scambiano occhiate gelide.", "Nell'attesa, nessuno dei due arretra di un centimetro.", "Silenzio teso. Si sentono i passi di {terzo}."],
+      },
+    },
+    chiusura: {
+      interviene_terzo: {
+        terzo: ["Signori, qui ci sono delle regole. Per favore, abbassiamo tutti i toni.", "Allora: o si sta tranquilli, o si va fuori. Decidete voi.", "Il regolamento è chiaro: rispetto per tutti. Grazie."],
+        narra: ["{Terzo} riporta l'ordine. Nessuno è contento, ma è finita.", "{Terzo} ascolta tutti e due, poi chiude la questione.", "Con l'arrivo di {terzo} la lite si sgonfia."],
+      },
+      qualcuno_se_ne_va: {
+        narra: ["{chi} se ne va a passo svelto. Fine della discussione.", "{chi} saluta tutti con un gesto teatrale ed esce di scena.", "{chi} decide di averne abbastanza e se ne va."],
+      },
+      intervengono_altri: {
+        folla: ["Basta, tutti e due!", "Ma non vi vergognate?", "Ragazzi, c'è gente che vorrebbe un po' di pace."],
+        narra: ["Dal pubblico qualcuno sbotta. Silenzio improvviso.", "Una signora lì accanto interviene. I due si zittiscono.", "Qualcuno applaude, ironicamente. La lite si spegne."],
+      },
+    },
+  };
+
+  const VOCI = {
+    marco: {
+      chiedere: ["Scusate, se potete {cosa} vi ringrazio, c'è gente.", "Scusa, ti dispiace {cosa}? Non ti costa niente."],
+      accettare: ["Va bene, hai ragione, non mi costa niente.", "Ok, se ti dà fastidio lo evito. Zero costi, zero drammi."],
+      rifiutare: ["Capisco, ma c'è un limite anche alle richieste.", "Ti capisco, ma qui non ti sto mancando di rispetto."],
+    },
+    luca: {
+      chiedere_fede: ["Scusate, so che non è un problema per tutti, ma a me fa male sentirlo. Potreste {cosa}?", "Scusa, per me è come sentire insultare qualcuno di caro. Potresti {cosa}?"],
+      chiedere: ["Scusa, potresti {cosa}? Te ne sarei grato."],
+      accettare: ["Hai ragione, scusa. Non era mia intenzione."],
+    },
+    gigi: {
+      chiedere_regolato: ["Chiediamo a {terzo}, così decide chi di dovere.", "Scusate, facciamo decidere a {terzo}?"],
+      rifiutare: ["Facciamo così, abbasso un po' e siamo tutti contenti?", "Dai, troviamo una via di mezzo."],
+      battuta: ["Ragazzi, se continuiamo così ci danno il premio per la lite dell'anno.", "Io propongo un armistizio. E un giro di caffè."],
+    },
+    sara: {
+      chiedere: ["Scusa, potresti {cosa}? Il problema è il volume, non le parole.", "Scusa, potresti {cosa}? Non ce l'ho con te, è uno spazio comune."],
+      rifiutare: ["Mi dispiace, ma stavo parlando con lui, non con te.", "Il rispetto lo devo a chi parla con me, non a chi ascolta per caso.", "Interessante. Ma non stavo parlando con te."],
+      accettare: ["Ok, mi modero. Non sapevo ti pesasse."],
+    },
+    ettore: {
+      chiedere: ["Scusa, potresti {cosa}? E non per motivi religiosi, eh."],
+      rifiutare: ["Me lo chiedi gentilmente, ma resta una pretesa.", "Perché il tuo sentimento dovrebbe valere più del mio?", "Pretesa mascherata da educazione. No, grazie."],
+      insistere: ["Le regole valgono per tutti, anche per te."],
+    },
+    rosa: {
+      chiedere: ["Mi scusi, per cortesia, potrebbe {cosa}? Alla mia età certe cose pesano.", "Per favore, potrebbe {cosa}? Ci tengo tanto."],
+    },
+    karim: {
+      chiedere: ["Scusa, potresti {cosa}? Per me è una cosa che pesa.", "Scusa, con rispetto: potresti {cosa}?"],
+    },
+    giulia: {
+      chiedere: ["Scusa, potresti {cosa}? Ci sono i miei figli qui.", "Scusa, i bambini ripetono tutto. Potresti {cosa}?"],
+    },
+    teo: {
+      rifiutare: ["Ma è un intercalare, da me si parla così!", "Non lo dico per offendere, mi scappa e basta."],
+      accettare: ["Ah, scusa, mi scappa. Da noi è come dire ciao."],
+    },
+    vale: {
+      chiedere: ["Scusa, potresti {cosa}? Mi sta scoppiando la testa.", "Potresti {cosa}? Sono molto sensibile a queste cose."],
+    },
+    dario: {
+      rifiutare: ["Ah, ti dà fastidio? Allora lo rifaccio.", "Che c'è, ti si è offeso il galateo?", "Il bello è proprio vedere la tua faccia."],
+    },
+  };
+
+  const DOMANDE = {
+    0: [{ id: "appropriata", testo: "La condotta di {autore} è appropriata in questo luogo?", tipo: "scala", estremi: ["per niente", "del tutto"] }],
+    1: [{ id: "fastidio_comprensibile", testo: "Il fastidio di {osservatore} è comprensibile?", tipo: "scala", estremi: ["per niente", "del tutto"] }],
+    2: [
+      { id: "richiesta_lecita", testo: "È lecito fare questa richiesta?", tipo: "sino" },
+      { id: "richiesta_ragionevole", testo: "È ragionevole?", tipo: "scala", estremi: ["per niente", "del tutto"] },
+      { id: "condotta_o_identita", testo: "Riguarda una condotta o un'identità?", tipo: "oggetto" },
+    ],
+    3: [
+      { id: "risposta_lecita", testo: "La risposta di {autore} è lecita?", tipo: "sino" },
+      { id: "cortese_accontentare", testo: "Sarebbe stato cortese accontentare?", tipo: "scala", estremi: ["per niente", "del tutto"] },
+    ],
+    4: [{ id: "piu_ragionevole", testo: "Chi sta agendo in modo più ragionevole adesso?", tipo: "scelta", opzioni: ["A", "B", "entrambi", "nessuno"] }],
+    5: [{ id: "responsabilita", testo: "Chi ha la responsabilità principale dello scontro?", tipo: "scelta", opzioni: ["A", "B", "condivisa"] }],
+    6: [{ id: "chi_ha_ragione", testo: "Alla fine, chi aveva ragione?", tipo: "scelta", opzioni: ["A", "B", "entrambi", "nessuno", "dipende"] }],
+  };
+
+  const ESITI = {
+    scena: "La scena",
+    sopporta: "Sopporta in silenzio",
+    allontana: "Si allontana senza dire niente",
+    chiede: "Decide di chiedere",
+    richiesta: "Fa la richiesta",
+    accetta: "Accetta",
+    accetta_a_meta: "Accetta a metà",
+    rifiuta_gentile: "Rifiuta gentilmente",
+    rifiuta_sgarbato: "Rifiuta sgarbatamente",
+    accetta_no: "Accetta il no",
+    si_allontana: "Se ne va",
+    insiste: "Insiste",
+    chiama_terzo: "Chiama un terzo",
+    cede_autore: "L'autore cede",
+    cede_osservatore: "Chi ha chiesto cede",
+    battuta: "Una battuta stempera",
+    insulti: "Insulti reciproci",
+    attesa_terzo: "Si aspetta il terzo",
+    interviene_terzo: "Interviene il terzo",
+    qualcuno_se_ne_va: "Qualcuno se ne va",
+    intervengono_altri: "Intervengono gli altri presenti",
+  };
+
+  function esaspera(p) {
+    const m = clamp(p.esasperazione ?? 1, 0.5, 1.5);
+    const tratti = {};
+    for (const k of TRATTI) tratti[k] = r3(clamp(0.5 + ((p.tratti?.[k] ?? 0.5) - 0.5) * m));
+    return { ...p, tratti };
+  }
+
+  const sensibilitaRilevante = (p, c) => (c.religiosa ? p.tratti.sensibilita_religiosa : p.tratti.sensibilita_generica);
+
+  function intensita(c, m) {
+    const vol = [0.6, 0.8, 1, 1.2][m.volume];
+    const freq = [0.85, 1, 1.15][m.frequenza];
+    const intento = ["provocazione", "offesa mirata"].includes(m.intento) ? 1.15 : 1;
+    const dest = m.destinatario === "a chi ascolta" ? 1.1 : 1;
+    return r3(clamp(c.intensita * vol * freq * intento * dest));
+  }
+
+  const bambiniVicini = m => [0, 0.3, 1][m.bambini];
+
+  function fastidio(sit, oss = sit.osservatore) {
+    const { luogo, condotta, modulatori: m } = sit;
+    return r3(clamp(
+      sensibilitaRilevante(oss, condotta) * intensita(condotta, m)
+      * (1 + 0.3 * bambiniVicini(m))
+      * (1 + 0.4 * (1 - luogo.allontanarsi))
+      * (1 + 0.3 * luogo.durata)
+    ));
+  }
+
+  function probabilita(sit, ctx = {}) {
+    const A = sit.autore.tratti, O = sit.osservatore.tratti;
+    const { luogo, modulatori: m, richiesta } = sit;
+    const F = fastidio(sit);
+    const chiede = clamp(F * O.propensione_a_chiedere * DRAMMATICITA);
+    const allontana = clamp((1 - chiede) * luogo.allontanarsi);
+    const sopporta = clamp(1 - chiede - allontana);
+    let accetta = A.cortesia * (1 - A.testardaggine) * BONUS_STILE[richiesta.stile]
+      * (1 - 0.5 * A.fastidio_intromissioni)
+      * (1 + 0.5 * bambiniVicini(m) * A.rispetto_contesto);
+    if (sit.identita) accetta *= 0.4;
+    if (m.intento === "provocazione") accetta *= 0.3;
+    if (["colleghi", "amici"].includes(m.rapporto)) accetta *= 1.2;
+    accetta = clamp(accetta);
+    const insiste = clamp(O.testardaggine * F * (ctx.sgarbato ? 1.3 : 1));
+    const chiama_terzo = luogo.regolato ? clamp(1 - O.testardaggine) : 0;
+    return { F, chiede: r3(chiede), allontana: r3(allontana), sopporta: r3(sopporta), accetta: r3(accetta), insiste: r3(insiste), chiama_terzo: r3(chiama_terzo) };
+  }
+
+  const nomiAmici = amici => (amici.length ? amici.map(a => a.nome).join(" e ") : "nessuno in particolare");
+  const fraseBambini = b => ["", "dei bambini che giocano poco lontano", "dei bambini lì accanto"][b];
+
+  function derivaRichiesta(rnd, sit) {
+    const O = sit.osservatore.tratti, c = sit.condotta, m = sit.modulatori;
+    const stile = pesato(rnd, STILI, [O.cortesia, 0.5, (1 - O.cortesia) * 0.8, (1 - O.cortesia) * O.testardaggine * 0.8]);
+    const forma = pesato(rnd, FORME, { gentile: [8, 2, 0], neutro: [5, 4, 1], secco: [0, 5, 5], aggressivo: [0, 4, 6] }[stile]);
+    let motivazione;
+    if (m.bambini > 0 && rnd() < 0.6) motivazione = "bambini";
+    else if (c.religiosa && O.sensibilita_religiosa > 0.5 && rnd() < 0.7) motivazione = "fede";
+    else if (sit.luogo.regolato && sit.luogo.silenzio > 0.5 && rnd() < 0.6) motivazione = "regole";
+    else motivazione = pesato(rnd, ["fastidio", "nessuna"], [O.sensibilita_generica, 1 - O.sensibilita_generica + 0.2]);
+    return { stile, forma, motivazione, oggetto: c.identita ? "identita" : "condotta", concreta: c.concreta };
+  }
+
+  function poolPersonaggi(opts) {
+    return (opts.personaggi || PERSONAGGI).filter(p => p.ruolo !== "terzo").map(esaspera);
+  }
+
+  function generaSituazione(seed, opts = {}) {
+    const rnd = mulberry32(seed);
+    const pool = poolPersonaggi(opts);
+    const luogo = pesato(rnd, LUOGHI, LUOGHI.map(() => 1));
+    const condotta = pesato(rnd, CONDOTTE, CONDOTTE.map(c => c.peso));
+    const bambini = pesato(rnd, [0, 1, 2], MODULATORI.bambini.pesi);
+    const ammesso = p => !p.vincoli?.bambini || bambini > 0;
+
+    const candA = pool.filter(ammesso);
+    const autore = pesato(rnd, candA, candA.map(p =>
+      condotta.tipo === "linguaggio" ? 0.1 + p.tratti.uso_bestemmia
+        : ["opinione", "comportamento"].includes(condotta.tipo) ? 1.1 - p.tratti.rispetto_contesto
+          : 1));
+    const candO = pool.filter(p => p.id !== autore.id && ammesso(p));
+    const osservatore = pesato(rnd, candO, candO.map(p => 0.2 + sensibilitaRilevante(p, condotta) + 0.3 * p.tratti.propensione_a_chiedere));
+    const resto = pool.filter(p => p.id !== autore.id && p.id !== osservatore.id && ammesso(p));
+    const nAmici = Math.min(resto.length, 1 + Math.floor(rnd() * 2));
+    const amici = [];
+    for (let i = 0; i < nAmici; i++) amici.push(resto.splice(Math.floor(rnd() * resto.length), 1)[0]);
+
+    let pesiVol = MODULATORI.volume.pesi;
+    if (condotta.volume) pesiVol = [0, 2, 4, 2];
+    const volume = pesato(rnd, [0, 1, 2, 3], pesiVol);
+    const frequenza = condotta.id === "bestemmia_singola" ? 0
+      : condotta.id === "bestemmie_ripetute" ? pesato(rnd, [1, 2], [2, 1])
+        : pesato(rnd, [0, 1, 2], MODULATORI.frequenza.pesi);
+    let intento = pesato(rnd, MODULATORI.intento.valori, MODULATORI.intento.pesi);
+    if (autore.id === "dario") intento = "provocazione";
+    else if (autore.id === "teo" && condotta.tipo === "linguaggio") intento = "intercalare";
+    const destinatario = intento === "offesa mirata" ? "a chi ascolta" : pesato(rnd, MODULATORI.destinatario.valori, MODULATORI.destinatario.pesi);
+    const rapporto = pesato(rnd, MODULATORI.rapporto.valori, MODULATORI.rapporto.pesi);
+    const religione = pesato(rnd, MODULATORI.religione.valori, MODULATORI.religione.pesi);
+    const pubblico = pesato(rnd, [0, 1, 2], luogo.pubblico);
+
+    const sit = {
+      seed, luogo, autore, osservatore, amici, condotta,
+      modulatori: { volume, frequenza, intento, destinatario, bambini, rapporto, religione, pubblico },
+      terzo: luogo.regolato ? luogo.terzo : null,
+      identita: !!condotta.identita,
+    };
+    sit.richiesta = derivaRichiesta(rnd, sit);
+    return sit;
+  }
+
+  const CASO_BASE = {
+    luogo: "parco", condotta: "bestemmia_singola", autore: "teo", osservatore: "luca", amici: ["gigi"],
+    volume: 1, frequenza: 0, intento: "intercalare", destinatario: "agli amici", bambini: 0,
+    rapporto: "sconosciuti", religione: "ignota", pubblico: 1,
+    stile: "gentile", forma: "domanda", motivazione: "fastidio",
+  };
+
+  function costruisciSituazione(params = {}, opts = {}) {
+    const p = { ...CASO_BASE, ...params };
+    const tutti = (opts.personaggi || PERSONAGGI).map(esaspera);
+    const trova = id => tutti.find(x => x.id === id) || tutti.find(x => x.ruolo !== "terzo");
+    const luogo = LUOGHI.find(l => l.id === p.luogo) || LUOGHI[0];
+    const condotta = CONDOTTE.find(c => c.id === p.condotta) || CONDOTTE[0];
+    const autore = trova(p.autore);
+    let osservatore = trova(p.osservatore);
+    if (osservatore.id === autore.id) osservatore = tutti.find(x => x.id !== autore.id && x.ruolo !== "terzo");
+    const amici = (p.amici || []).map(trova).filter(a => a && a.id !== autore.id && a.id !== osservatore.id);
+    const sit = {
+      seed: params.seed ?? 1, luogo, autore, osservatore, amici, condotta,
+      modulatori: {
+        volume: +p.volume, frequenza: +p.frequenza, intento: p.intento, destinatario: p.destinatario,
+        bambini: +p.bambini, rapporto: p.rapporto, religione: p.religione, pubblico: +p.pubblico,
+      },
+      terzo: luogo.regolato ? luogo.terzo : null,
+      identita: !!condotta.identita,
+      costruita: true,
+    };
+    sit.richiesta = { stile: p.stile, forma: p.forma, motivazione: p.motivazione, oggetto: condotta.identita ? "identita" : "condotta", concreta: condotta.concreta };
+    return sit;
+  }
+
+  function contesto(sit) {
+    const c = sit.condotta;
+    return {
+      autore: sit.autore.nome, osservatore: sit.osservatore.nome,
+      luogo: sit.luogo.frase, amici: nomiAmici(sit.amici), amico: sit.amici[0]?.nome || "qualcuno",
+      condotta: c.etichetta, bambini: fraseBambini(sit.modulatori.bambini),
+      terzo: sit.terzo || "qualcuno", cosa: c.cosa, azione: c.azione, imp: c.imp,
+    };
+  }
+
+  function riempi(str, ctx) {
+    return str.replace(/\{(\w+)\}/g, (_, k) => {
+      const low = k[0].toLowerCase() + k.slice(1);
+      const v = ctx[k] ?? ctx[low];
+      if (v === undefined) return `{${k}}`;
+      return k[0] === k[0].toUpperCase() && k[0] !== k[0].toLowerCase() ? cap(v) : v;
+    });
+  }
+
+  function intensitaCensura(m) {
+    return m.volume >= 3 || m.frequenza >= 2 ? 3 : m.volume >= 2 || m.frequenza >= 1 ? 2 : 1;
+  }
+
+  function simulaPercorso(seedOSit, opts = {}) {
+    const sit = typeof seedOSit === "number" ? generaSituazione(seedOSit, opts) : seedOSit;
+    const forza = opts.forza || {};
+    const rnd = mulberry32((Math.imul(sit.seed, 2654435761) ^ 0x5bd1e995) >>> 0);
+    const ctx = contesto(sit);
+    const livCens = intensitaCensura(sit.modulatori);
+    const T = TEMPLATE;
+    const A = sit.autore, O = sit.osservatore, c = sit.condotta, L = sit.luogo, m = sit.modulatori;
+    const voce = (p, chiave) => VOCI[p.voce || p.id]?.[chiave];
+    const frase = (arr, extra = {}) => riempi(pick(rnd, arr), { ...ctx, ...extra })
+      .replace(/\[bestemmia\]/g, `[bestemmia:${livCens}]`);
+    const ids = [A.id, O.id, ...sit.amici.map(a => a.id)];
+    const posaBase = L.seduti ? "seduto" : "in piedi";
+    let stato = { espressioni: Object.fromEntries(ids.map(i => [i, "calmo"])), pose: Object.fromEntries(ids.map(i => [i, posaBase])), terzo: false, folla: false };
+    const passi = [];
+    const passo = (livello, esito, testi, mod = {}, fine = false, cede = false) => {
+      stato = {
+        espressioni: { ...stato.espressioni, ...(mod.espressioni || {}) },
+        pose: { ...stato.pose, ...(mod.pose || {}) },
+        terzo: mod.terzo ?? stato.terzo,
+        folla: mod.folla ?? stato.folla,
+      };
+      passi.push({ livello, nome: LIVELLI[livello], esito, sintesi: ESITI[esito], testi, espressioni: stato.espressioni, pose: stato.pose, terzo: stato.terzo, folla: stato.folla, fine, cede });
+      return fine;
+    };
+    const imbarazzaAmici = () => Object.fromEntries(sit.amici.map(a => [a.id, "imbarazzato"]));
+
+    const sc = T.scena[c.id];
+    passo(0, "scena", [
+      { chi: "narratore", tipo: "narratore", testo: `${pick(rnd, L.intro)} ${frase(sc.narra)}` },
+      { chi: A.id, tipo: m.volume >= 3 ? "urlato" : m.volume === 0 ? "sussurro" : "parlato", testo: frase(sc.battuta) },
+    ]);
+
+    const P = probabilita(sit);
+    const e1 = forza[1] || pesato(rnd, ["chiede", "allontana", "sopporta"], [P.chiede, P.allontana, P.sopporta]);
+    const f1 = T.fastidio[e1];
+    const pensieroFede = e1 === "chiede" && c.religiosa && O.tratti.sensibilita_religiosa > 0.6 ? ["Mi fa male sentirlo. Glielo dico.", "Non è la prima volta. Stavolta glielo dico."] : null;
+    if (passo(1, e1, [
+      { chi: "narratore", tipo: "narratore", testo: frase(f1.narra) },
+      { chi: O.id, tipo: "pensiero", testo: frase(pensieroFede || f1.pensiero) },
+    ], {
+      espressioni: { [O.id]: e1 === "chiede" ? "perplesso" : "infastidito" },
+      pose: e1 === "allontana" ? { [O.id]: "allontana" } : {},
+    }, e1 !== "chiede", false)) return passi;
+
+    const R = sit.richiesta;
+    let testoRichiesta;
+    const vChiedereFede = c.religiosa && voce(O, "chiedere_fede");
+    const vChiedereReg = L.regolato && voce(O, "chiedere_regolato");
+    const vChiedere = voce(O, "chiedere");
+    const usaVoce = rnd() < 0.5 && ["gentile", "neutro"].includes(R.stile);
+    if (usaVoce && (vChiedereFede || vChiedere)) testoRichiesta = frase(vChiedereFede || vChiedere);
+    else if (usaVoce && vChiedereReg) testoRichiesta = frase(vChiedereReg);
+    else {
+      const apertura = pick(rnd, T.richiesta.apertura[R.stile]);
+      const corpo = riempi(pick(rnd, T.richiesta.corpo[R.forma]), ctx);
+      const motivo = pick(rnd, T.richiesta.motivo[R.motivazione]);
+      testoRichiesta = apertura ? apertura + (/[.?!] $/.test(apertura) ? cap(corpo) : corpo) + motivo : cap(corpo) + motivo;
+    }
+    const testi2 = [{ chi: O.id, tipo: R.stile === "aggressivo" ? "urlato" : "parlato", testo: testoRichiesta }];
+    if (sit.amici.length && rnd() < 0.6) testi2.push({ chi: sit.amici[0].id, tipo: "sussurro", testo: frase(T.richiesta.reazione_amici) });
+    passo(2, "richiesta", testi2, {
+      espressioni: { [O.id]: { gentile: "imbarazzato", neutro: "infastidito", secco: "infastidito", aggressivo: "arrabbiato" }[R.stile], [A.id]: "perplesso" },
+      pose: { [O.id]: posaBase },
+    });
+
+    const r = rnd();
+    let e3 = forza[3];
+    if (!e3) {
+      if (r < P.accetta * 0.75) e3 = "accetta";
+      else if (r < P.accetta && !sit.identita) e3 = "accetta_a_meta";
+      else if (r < P.accetta) e3 = "accetta";
+      else e3 = rnd() < A.tratti.cortesia ? "rifiuta_gentile" : "rifiuta_sgarbato";
+    }
+    const id = sit.identita ? "_identita" : "";
+    let risposta;
+    if (e3.startsWith("accetta")) risposta = voce(A, "accettare") && rnd() < 0.5 && !sit.identita ? frase(voce(A, "accettare")) : frase(T.risposta[e3 === "accetta" ? "accetta" + id : e3]);
+    else risposta = voce(A, "rifiutare") && rnd() < 0.5 && !sit.identita ? frase(voce(A, "rifiutare")) : frase(T.risposta[e3 + id]);
+    const testi3 = [{ chi: A.id, tipo: e3 === "rifiuta_sgarbato" ? "urlato" : "parlato", testo: risposta }];
+    if (e3 === "accetta") {
+      testi3.push({ chi: O.id, tipo: "parlato", testo: frase(T.risposta.ringrazia) });
+      testi3.push({ chi: "narratore", tipo: "narratore", testo: frase(T.risposta.chiusura_pace) });
+    }
+    if (passo(3, e3, testi3, {
+      espressioni: {
+        ...(e3 === "rifiuta_sgarbato" ? imbarazzaAmici() : {}),
+        [A.id]: { accetta: "imbarazzato", accetta_a_meta: "infastidito", rifiuta_gentile: "calmo", rifiuta_sgarbato: "arrabbiato" }[e3],
+        [O.id]: { accetta: "sollevato", accetta_a_meta: "perplesso", rifiuta_gentile: "infastidito", rifiuta_sgarbato: "arrabbiato" }[e3],
+      },
+    }, e3.startsWith("accetta"), e3.startsWith("accetta"))) return passi;
+
+    const P4 = probabilita(sit, { sgarbato: e3 === "rifiuta_sgarbato" });
+    const pi = P4.insiste, pt = P4.chiama_terzo * (1 - pi);
+    const restoP = (1 - pi) * (1 - P4.chiama_terzo);
+    const e4 = forza[4] || pesato(rnd, ["insiste", "chiama_terzo", "accetta_no", "si_allontana"],
+      [pi, pt, restoP * (1 - L.allontanarsi + 0.1), restoP * L.allontanarsi]);
+    const d4 = T.dopo[e4];
+    const v4 = e4 === "insiste" && voce(O, "insistere") && rnd() < 0.5 ? voce(O, "insistere") : d4.osservatore;
+    const vTerzo = e4 === "chiama_terzo" && voce(O, "chiedere_regolato") && rnd() < 0.5 ? voce(O, "chiedere_regolato") : null;
+    if (passo(4, e4, [
+      { chi: "narratore", tipo: "narratore", testo: frase(d4.narra) },
+      { chi: O.id, tipo: e4 === "insiste" && R.stile !== "gentile" ? "urlato" : e4 === "si_allontana" ? "sussurro" : "parlato", testo: frase(vTerzo || v4) },
+    ], {
+      espressioni: {
+        [O.id]: { insiste: "arrabbiato", chiama_terzo: "calmo", accetta_no: "perplesso", si_allontana: "infastidito" }[e4],
+        [A.id]: { insiste: "infastidito", chiama_terzo: "perplesso", accetta_no: "sollevato", si_allontana: "perplesso" }[e4],
+      },
+      pose: e4 === "si_allontana" ? { [O.id]: "allontana" } : {},
+    }, ["accetta_no", "si_allontana"].includes(e4), ["accetta_no", "si_allontana"].includes(e4))) return passi;
+
+    const terzoChiamato = e4 === "chiama_terzo";
+    let e5 = forza[5];
+    if (!e5) {
+      if (terzoChiamato) e5 = "attesa_terzo";
+      else {
+        const pc = 0.5 * ((1 - A.tratti.testardaggine) + (1 - O.tratti.testardaggine)) / 2 + 0.1;
+        const haMediatore = sit.amici.some(a => voce(a, "battuta")) ? 0.25 : 0;
+        const pb = 0.15 + haMediatore;
+        const scelta = pesato(rnd, ["cede", "battuta", "insulti"], [pc, pb, Math.max(0.1, 1 - pc - pb)]);
+        e5 = scelta === "cede" ? pesato(rnd, ["cede_autore", "cede_osservatore"], [1 - A.tratti.testardaggine + 0.05, 1 - O.tratti.testardaggine + 0.05]) : scelta;
+      }
+    }
+    const d5 = T.scontro[e5];
+    let testi5;
+    if (e5 === "insulti") testi5 = [
+      { chi: A.id, tipo: "urlato", testo: frase(d5.autore) },
+      { chi: O.id, tipo: "urlato", testo: frase(d5.osservatore) },
+      { chi: "narratore", tipo: "narratore", testo: frase(d5.narra) },
+    ];
+    else if (e5 === "battuta") {
+      const mediatore = sit.amici.find(a => voce(a, "battuta")) || sit.amici[0] || A;
+      testi5 = [
+        { chi: mediatore.id, tipo: "parlato", testo: frase(voce(mediatore, "battuta") || d5.battuta) },
+        { chi: "narratore", tipo: "narratore", testo: frase(d5.narra) },
+      ];
+    } else if (e5 === "attesa_terzo") testi5 = [
+      { chi: "narratore", tipo: "narratore", testo: frase(d5.narra) },
+      { chi: A.id, tipo: "sussurro", testo: frase(d5.autore) },
+    ];
+    else {
+      const chi = e5 === "cede_autore" ? A : O;
+      testi5 = [
+        { chi: chi.id, tipo: "parlato", testo: frase(e5 === "cede_autore" ? d5.autore : d5.osservatore) },
+        { chi: "narratore", tipo: "narratore", testo: frase(d5.narra) },
+      ];
+    }
+    const espr5 = {
+      insulti: { ...imbarazzaAmici(), [A.id]: "arrabbiato", [O.id]: "arrabbiato" },
+      battuta: Object.fromEntries(ids.map(i => [i, "sollevato"])),
+      attesa_terzo: { [A.id]: "infastidito", [O.id]: "infastidito" },
+      cede_autore: { [A.id]: "imbarazzato", [O.id]: "sollevato" },
+      cede_osservatore: { [O.id]: "imbarazzato", [A.id]: "sollevato" },
+    }[e5];
+    const fine5 = ["cede_autore", "cede_osservatore", "battuta"].includes(e5);
+    if (passo(5, e5, testi5, { espressioni: espr5 }, fine5, fine5)) return passi;
+
+    let e6 = forza[6];
+    if (!e6) {
+      if (terzoChiamato) e6 = "interviene_terzo";
+      else e6 = pesato(rnd, ["interviene_terzo", "qualcuno_se_ne_va", "intervengono_altri"],
+        [L.regolato ? 0.5 : 0, 0.3 + L.allontanarsi * 0.5, m.pubblico > 0 ? 0.3 + 0.2 * m.pubblico : 0]);
+    }
+    const d6 = T.chiusura[e6];
+    let testi6, mod6 = {};
+    if (e6 === "interviene_terzo") {
+      testi6 = [{ chi: "terzo", tipo: "sistema", testo: frase(d6.terzo) }, { chi: "narratore", tipo: "narratore", testo: frase(d6.narra) }];
+      mod6 = { terzo: true, espressioni: { [A.id]: "imbarazzato", [O.id]: "imbarazzato" } };
+    } else if (e6 === "qualcuno_se_ne_va") {
+      const chi = pesato(rnd, [A, O], [1 - A.tratti.testardaggine + 0.1, 1 - O.tratti.testardaggine + 0.1]);
+      testi6 = [{ chi: "narratore", tipo: "narratore", testo: frase(d6.narra, { chi: chi.nome }) }];
+      mod6 = { pose: { [chi.id]: "allontana" }, espressioni: { [chi.id]: "infastidito" } };
+    } else {
+      testi6 = [{ chi: "folla", tipo: "urlato", testo: frase(d6.folla) }, { chi: "narratore", tipo: "narratore", testo: frase(d6.narra) }];
+      mod6 = { folla: true, espressioni: { [A.id]: "imbarazzato", [O.id]: "imbarazzato" } };
+    }
+    passo(6, e6, testi6, mod6, true, false);
+    return passi;
+  }
+
+  const TOKEN = /\[(bestemmia|parolaccia|insulto)(?::(\d))?\]/g;
+  function segmenti(testo) {
+    const out = [];
+    let last = 0;
+    for (const mt of testo.matchAll(TOKEN)) {
+      if (mt.index > last) out.push({ tipo: "testo", testo: testo.slice(last, mt.index) });
+      const intensita = mt[1] === "bestemmia" ? +(mt[2] || 2) : mt[1] === "insulto" ? 2 : 1;
+      out.push({ tipo: "censura", parola: mt[1], intensita });
+      last = mt.index + mt[0].length;
+    }
+    if (last < testo.length) out.push({ tipo: "testo", testo: testo.slice(last) });
+    return out;
+  }
+  const ALT = { bestemmia: "[bestemmia censurata]", parolaccia: "[parolaccia censurata]", insulto: "[insulto censurato]" };
+  const testoPiano = testo => segmenti(testo).map(s => (s.tipo === "testo" ? s.testo : ALT[s.parola])).join("");
+
+  function domande(livello, sit) {
+    const ctx = contesto(sit);
+    return (DOMANDE[livello] || []).map(d => {
+      let opzioni;
+      if (d.tipo === "scala") opzioni = [1, 2, 3, 4, 5].map(v => ({ valore: v, etichetta: String(v) }));
+      else if (d.tipo === "sino") opzioni = [{ valore: "si", etichetta: "Sì" }, { valore: "no", etichetta: "No" }];
+      else if (d.tipo === "oggetto") opzioni = [{ valore: "condotta", etichetta: "Una condotta (cosa fa)" }, { valore: "identita", etichetta: "Un'identità (chi è)" }];
+      else {
+        const nomi = { A: `A · ${sit.autore.nome}`, B: `B · ${sit.osservatore.nome}`, entrambi: "Entrambi", nessuno: "Nessuno", condivisa: "Condivisa", dipende: "Dipende" };
+        opzioni = d.opzioni.map(v => ({ valore: v, etichetta: nomi[v] }));
+      }
+      return { ...d, testo: riempi(d.testo, ctx), opzioni };
+    });
+  }
+
+  function testiPercorso(seedOSit, opts = {}) {
+    const sit = typeof seedOSit === "number" ? generaSituazione(seedOSit, opts) : seedOSit;
+    const passi = simulaPercorso(sit, opts);
+    const out = [];
+    for (const p of passi) {
+      for (const tx of p.testi) out.push(testoPiano(tx.testo));
+      for (const d of domande(p.livello, sit)) out.push(d.testo, ...d.opzioni.map(o => o.etichetta));
+    }
+    return out;
+  }
+
+  function favoreB(p, sit, percorso) {
+    const s = sensibilitaRilevante(p, sit.condotta), tr = p.tratti;
+    const e3 = percorso[3]?.esito, e4 = percorso[4]?.esito, e5 = percorso[5]?.esito;
+    let v = 0.2 + 0.3 * s + 0.25 * tr.rispetto_contesto + 0.25 * (1 - tr.fastidio_intromissioni);
+    if (sit.identita) v -= 0.45;
+    if (sit.condotta.danno_oggettivo) v += 0.2;
+    if (e3 === "rifiuta_sgarbato") v += 0.15;
+    v -= { gentile: 0, neutro: 0.03, secco: 0.08, aggressivo: 0.18 }[sit.richiesta.stile];
+    if (e4 === "insiste") v -= 0.1;
+    if (e4 === "accetta_no") v += 0.1;
+    if (e4 === "chiama_terzo") v += 0.05 * tr.rispetto_contesto;
+    if (e5 === "insulti") v -= 0.05;
+    return clamp(v);
+  }
+
+  function votoPrevisto(personaggio, sit, domandaId, percorso = []) {
+    const p = esaspera(personaggio);
+    const c = sit.condotta, m = sit.modulatori, tr = p.tratti;
+    const s = sensibilitaRilevante(p, c);
+    const inten = intensita(c, m);
+    const id = sit.identita;
+    const scala = v => Math.round(1 + 4 * clamp(v));
+    const malusStile = { gentile: 0, neutro: 0.05, secco: 0.15, aggressivo: 0.3 }[sit.richiesta.stile];
+    const e3 = percorso[3]?.esito;
+    const fb = favoreB(p, sit, percorso);
+    const banda = 0.08 + 0.12 * tr.cortesia;
+    switch (domandaId) {
+      case "appropriata": {
+        if (id) return 5;
+        const disturbo = clamp((0.5 * s + 0.3 * tr.rispetto_contesto + 0.2 * (m.bambini > 0 ? 1 : 0)) * (0.5 + inten) * (0.6 + 0.4 * sit.luogo.silenzio + (c.danno_oggettivo ? 0.3 : 0)));
+        return scala(1 - disturbo);
+      }
+      case "fastidio_comprensibile":
+        return scala(id ? 0.1 + 0.15 * s : 0.55 * s + 0.25 * tr.rispetto_contesto + 0.2 * inten + (c.danno_oggettivo ? 0.3 : 0));
+      case "richiesta_lecita": {
+        const v = id ? 0.2 + 0.2 * s : 0.45 + 0.3 * s + 0.25 * (1 - tr.fastidio_intromissioni) - malusStile * 0.5 + (c.danno_oggettivo ? 0.3 : 0);
+        return v >= 0.5 ? "si" : "no";
+      }
+      case "richiesta_ragionevole": {
+        let v = 0.4 * s + 0.3 * tr.rispetto_contesto + 0.3 * (1 - tr.fastidio_intromissioni);
+        if (id) v *= 0.35;
+        return scala(v - malusStile + (c.danno_oggettivo ? 0.2 : 0));
+      }
+      case "condotta_o_identita":
+        return id ? "identita" : "condotta";
+      case "risposta_lecita": {
+        if (e3?.startsWith("accetta")) return "si";
+        const v = 0.35 + 0.35 * tr.fastidio_intromissioni + 0.3 * (1 - s) - (e3 === "rifiuta_sgarbato" ? 0.25 : 0) - (c.danno_oggettivo ? 0.35 : 0) + (id ? 0.4 : 0);
+        return v >= 0.5 ? "si" : "no";
+      }
+      case "cortese_accontentare":
+        return scala(id ? 0.1 + 0.15 * tr.cortesia : (0.35 * tr.rispetto_contesto + 0.3 * tr.cortesia + 0.35 * s) * (c.evitabile === true ? 1 : 0.7));
+      case "piu_ragionevole":
+        if (fb > 0.5 + banda) return "B";
+        if (fb < 0.5 - banda) return "A";
+        return ["accetta_no", "si_allontana", "chiama_terzo"].includes(percorso[4]?.esito) ? "entrambi" : "nessuno";
+      case "responsabilita":
+        if (fb > 0.5 + banda) return "A";
+        if (fb < 0.5 - banda) return "B";
+        return "condivisa";
+      case "chi_ha_ragione":
+        if (fb > 0.5 + banda) return "B";
+        if (fb < 0.5 - banda) return "A";
+        if (tr.testardaggine < 0.3) return "dipende";
+        return tr.cortesia > 0.7 ? "entrambi" : "nessuno";
+      default:
+        return null;
+    }
+  }
+
+  const principali = (personaggi = PERSONAGGI) => personaggi.filter(p => p.principale);
+
+  function lenti(sit, percorso, livello, domandaId, personaggi = PERSONAGGI) {
+    return principali(personaggi).map(p => ({ id: p.id, nome: p.nome, lente: p.lente, valore: votoPrevisto(p, sit, domandaId, percorso) }));
+  }
+
+  const TIPO_DOMANDA = Object.fromEntries(Object.values(DOMANDE).flat().map(d => [d.id, d.tipo]));
+  function distanza(domandaId, a, b) {
+    if (TIPO_DOMANDA[domandaId] === "scala") return Math.abs(+a - +b) / 4;
+    return a === b ? 0 : 1;
+  }
+
+  function somiglianza(voti, sit, percorso, personaggi = PERSONAGGI) {
+    return principali(personaggi).map(p => {
+      let d = 0, n = 0;
+      for (const v of voti) {
+        const previsto = votoPrevisto(p, sit, v.domanda, percorso);
+        if (previsto == null) continue;
+        d += distanza(v.domanda, v.valore, previsto);
+        n++;
+      }
+      return { id: p.id, nome: p.nome, distanza: n ? r3(d / n) : null, n };
+    }).sort((a, b) => (a.distanza ?? 9) - (b.distanza ?? 9));
+  }
+
+  function etichettaCaso(voti, sit, percorso, personaggi = PERSONAGGI) {
+    const v = Object.fromEntries(voti.map(x => [x.domanda, x.valore]));
+    const parti = [];
+    if (percorso.length <= 2) {
+      parti.push("nessuna richiesta");
+      parti.push(percorso[1]?.esito === "allontana" ? "qualcuno ha cambiato aria" : "fastidio sopportato in silenzio");
+      return parti.join(", ");
+    }
+    if (v.richiesta_lecita) parti.push(v.richiesta_lecita === "si" ? "richiesta lecita" : "richiesta non lecita");
+    if (v.richiesta_ragionevole != null) {
+      const tuttiVoti = [+v.richiesta_ragionevole, ...lenti(sit, percorso, 2, "richiesta_ragionevole", personaggi).map(l => l.valore)];
+      const media = tuttiVoti.reduce((a, b) => a + b, 0) / tuttiVoti.length;
+      parti.push(Math.max(...tuttiVoti) - Math.min(...tuttiVoti) >= 3 ? "ragionevolezza divisa" : media >= 3.5 ? "richiesta ragionevole" : media <= 2.5 ? "richiesta poco ragionevole" : "ragionevolezza media");
+    }
+    const e3 = percorso[3]?.esito;
+    if (e3) {
+      if (e3.startsWith("accetta")) parti.push("richiesta accolta");
+      else if (v.risposta_lecita) parti.push(v.risposta_lecita === "si" ? "rifiuto lecito" : "rifiuto non lecito");
+      else parti.push("rifiuto");
+    }
+    const ultimo = percorso[percorso.length - 1];
+    if (ultimo.livello >= 4) parti.push(ESITI[ultimo.esito].toLowerCase());
+    if (sit.identita) parti.push("richiesta su un'identità");
+    return parti.join(", ");
+  }
+
+  return Object.freeze({
+    LIVELLI, TRATTI, NOMI_TRATTI, PERSONAGGI, LUOGHI, CONDOTTE, MODULATORI, STILI, FORME, MOTIVAZIONI, CONCRETE,
+    BONUS_STILE, DRAMMATICITA, TEMPLATE, VOCI, DOMANDE, ESITI, CASO_BASE,
+    mulberry32, pesato, clamp, esaspera, sensibilitaRilevante, intensita, fastidio, probabilita,
+    generaSituazione, costruisciSituazione, simulaPercorso, testiPercorso, segmenti, testoPiano,
+    domande, votoPrevisto, lenti, somiglianza, etichettaCaso, distanza, principali,
+  });
+})();
+</script>
+<script id="asset">
+globalThis.Asset = (() => {
+  const INK = "#2E3136";
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const scurisci = (hex, f = 0.75) => {
+    const n = parseInt(hex.slice(1), 16);
+    const c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v * f));
+    return "#" + c.map(v => v.toString(16).padStart(2, "0")).join("");
+  };
+
+  const ESPRESSIONI = ["calmo", "perplesso", "infastidito", "arrabbiato", "imbarazzato", "sollevato"];
+  const POSE = ["in piedi", "seduto", "voltato", "allontana"];
+  const DISTINTIVI = ["maglione", "giacca", "cappello", "occhiali", "giubbotto", "foulard", "kufi", "passeggino", "cuffie", "mascherina", "occhiali_sole", "badge", "nessuno"];
+  const TAGLI = ["corti", "lunghi", "raccolti", "ricci", "calvo"];
+  const ETICHETTE_ESPRESSIONE = { calmo: "calma", perplesso: "perplessa", infastidito: "infastidita", arrabbiato: "arrabbiata", imbarazzato: "imbarazzata", sollevato: "sollevata" };
+  const ETICHETTE_POSA = { "in piedi": "in piedi", seduto: "seduta", voltato: "di spalle", allontana: "che se ne va" };
+
+  function capelli(av, retro) {
+    const c = av.capelli || "#3B2A20";
+    const s = `fill="${c}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
+    if (retro) {
+      if (av.taglio === "calvo") return `<path d="M34 46 Q36 66 46 74 M86 46 Q84 66 74 74" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`;
+      const lungo = av.taglio === "lunghi" ? `<path d="M32 50 Q30 92 40 98 L80 98 Q90 92 88 50 Z" ${s}/>` : "";
+      return `${lungo}<circle cx="60" cy="52" r="28" ${s}/>${av.taglio === "raccolti" ? `<circle cx="60" cy="24" r="10" ${s}/>` : ""}`;
+    }
+    switch (av.taglio) {
+      case "calvo": return `<path d="M33 50 Q33 40 38 36 M87 50 Q87 40 82 36" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`;
+      case "lunghi": return `<path d="M30 54 Q28 18 60 20 Q92 18 90 54 L92 96 Q84 100 80 92 L80 46 Q60 36 40 46 L40 92 Q36 100 28 96 Z" ${s}/>`;
+      case "raccolti": return `<circle cx="60" cy="20" r="11" ${s}/><path d="M32 50 Q34 22 60 23 Q86 22 88 50 Q78 34 60 34 Q42 34 32 50 Z" ${s}/>`;
+      case "ricci": return [[38, 34], [50, 26], [62, 24], [74, 27], [84, 36], [34, 46], [87, 47]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9" ${s}/>`).join("");
+      default: return `<path d="M32 52 Q32 20 60 21 Q88 20 88 52 Q82 36 64 36 Q54 30 44 38 Q36 42 32 52 Z" ${s}/>`;
+    }
+  }
+
+  function faccia(espr, dir) {
+    const px = dir * 1.6;
+    const occhi = (r = 3.4) => `<circle cx="${49 + px}" cy="54" r="${r}" fill="${INK}"/><circle cx="${71 + px}" cy="54" r="${r}" fill="${INK}"/>`;
+    const L = (d, w = 3) => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    switch (espr) {
+      case "perplesso": return occhi() + L("M43 44 L55 44") + L("M65 41 Q71 36 77 41") + L("M52 68 L68 65") + `<text x="94" y="26" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="26" fill="${INK}">?</text>`;
+      case "infastidito": return occhi(3) + L("M43 50 L55 50", 2) + L("M65 50 L77 50", 2) + L("M42 42 L55 46") + L("M65 46 L78 42") + L("M52 68 L68 68");
+      case "arrabbiato": return occhi() + L("M41 40 L56 48", 3.5) + L("M64 48 L79 40", 3.5)
+        + `<ellipse cx="60" cy="70" rx="8" ry="5.5" fill="${INK}"/><rect x="54" y="65.5" width="12" height="3" rx="1" fill="#fff"/>`
+        + `<ellipse cx="40" cy="64" rx="6" ry="3.5" fill="#C8322B" opacity=".45"/><ellipse cx="80" cy="64" rx="6" ry="3.5" fill="#C8322B" opacity=".45"/>`
+        + L("M24 40 q-6 -6 0 -12 q6 -6 0 -12", 2.5) + L("M96 40 q6 -6 0 -12 q-6 -6 0 -12", 2.5);
+      case "imbarazzato": return occhi() + L("M43 43 Q49 39 55 43") + L("M65 43 Q71 39 77 43") + L("M51 68 Q55 64 59 68 Q63 72 69 68")
+        + `<ellipse cx="41" cy="63" rx="6" ry="3.5" fill="#E58FA0" opacity=".7"/><ellipse cx="79" cy="63" rx="6" ry="3.5" fill="#E58FA0" opacity=".7"/>`
+        + `<path d="M88 30 Q93 38 88 42 Q83 38 88 30 Z" fill="#8FC3E8" stroke="${INK}" stroke-width="2"/>`;
+      case "sollevato": return L("M44 55 Q49 50 54 55") + L("M66 55 Q71 50 76 55") + L("M43 44 Q49 41 55 44") + L("M65 44 Q71 41 77 44")
+        + `<path d="M49 64 Q60 78 71 64 Z" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
+        + `<g fill="#fff" stroke="${INK}" stroke-width="2"><circle cx="${dir > 0 ? 100 : 20}" cy="58" r="5"/><circle cx="${dir > 0 ? 108 : 12}" cy="50" r="3"/></g>`;
+      default: return occhi() + L("M43 44 L55 43") + L("M65 43 L77 44") + L("M52 66 Q60 72 68 66");
+    }
+  }
+
+  function distintivoSotto(av, mini) {
+    if (av.distintivo !== "passeggino" || mini) return "";
+    return `<g transform="translate(96 120)" stroke="${INK}" stroke-width="3" stroke-linejoin="round">
+      <path d="M-4 -4 L10 0 L14 30" fill="none" stroke-linecap="round"/>
+      <path d="M10 22 Q12 50 40 50 Q62 50 62 26 Z" fill="${av.colore}"/>
+      <circle cx="36" cy="20" r="9" fill="#F1D3B8"/>
+      <circle cx="20" cy="64" r="8" fill="#555"/><circle cx="54" cy="64" r="8" fill="#555"/></g>`;
+  }
+
+  function distintivoCorpo(av, W) {
+    const scuro = scurisci(av.colore);
+    const s = `stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
+    switch (av.distintivo) {
+      case "maglione": return `<rect x="46" y="80" width="28" height="12" rx="6" fill="${scuro}" ${s}/><path d="M${62 - W / 2} 112 H${58 + W / 2} M${62 - W / 2} 124 H${58 + W / 2}" stroke="#fff" stroke-opacity=".45" stroke-width="3"/>`;
+      case "giacca": return `<path d="M60 86 L48 84 L57 116 Z M60 86 L72 84 L63 116 Z" fill="${scuro}" ${s}/><circle cx="60" cy="124" r="2.6" fill="${INK}"/><circle cx="60" cy="136" r="2.6" fill="${INK}"/>`;
+      case "giubbotto": return `<path d="M60 88 V148" stroke="#C9CCD1" stroke-width="3"/><path d="M60 86 L46 84 L52 100 Z M60 86 L74 84 L68 100 Z" fill="${scuro}" ${s}/><circle cx="${60 + W / 4}" cy="106" r="4.5" fill="#F2C230" ${s}/>`;
+      case "badge": return `<path d="M57 86 H63 L66 120 L60 128 L54 120 Z" fill="#C8322B" ${s}/><rect x="${60 + W / 5}" y="98" width="16" height="10" rx="2" fill="#fff" ${s}/>`;
+      case "cuffie": return `<path d="M40 84 Q60 100 80 84" fill="none" stroke="${INK}" stroke-width="5"/><circle cx="40" cy="84" r="7" fill="#222" ${s}/><circle cx="80" cy="84" r="7" fill="#222" ${s}/>`;
+      default: return "";
+    }
+  }
+
+  function distintivoTesta(av, retro) {
+    const s = `stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
+    switch (av.distintivo) {
+      case "cappello": return `<rect x="40" y="6" width="40" height="24" rx="7" fill="#5A3B1E" ${s}/><rect x="40" y="20" width="40" height="6" fill="#2E2E2E"/><ellipse cx="60" cy="30" rx="38" ry="6" fill="#5A3B1E" ${s}/>`;
+      case "foulard": return `<path d="M28 56 Q26 16 60 16 Q94 16 92 56 L86 62 Q84 34 60 32 Q36 34 34 62 Z" fill="${av.colore}" ${s}/>${retro ? "" : `<path d="M50 82 L60 94 L70 82 Z" fill="${av.colore}" ${s}/>`}`;
+      case "kufi": return `<path d="M38 34 Q40 16 60 16 Q80 16 82 34 Z" fill="#F4F1E8" ${s}/>${retro ? "" : `<path d="M36 60 Q38 84 60 86 Q82 84 84 60 Q78 74 60 76 Q42 74 36 60 Z" fill="${av.capelli}" ${s}/>`}`;
+      default: return "";
+    }
+  }
+
+  function distintivoViso(av, dir) {
+    const px = dir * 1.6;
+    switch (av.distintivo) {
+      case "occhiali": return `<g fill="none" stroke="${INK}" stroke-width="2.6"><circle cx="${49 + px}" cy="54" r="8.5"/><circle cx="${71 + px}" cy="54" r="8.5"/><path d="M${57.5 + px} 54 H${62.5 + px}"/></g>`;
+      case "occhiali_sole": return `<g fill="#111" stroke="${INK}" stroke-width="2"><rect x="${39 + px}" y="48" width="18" height="11" rx="4"/><rect x="${63 + px}" y="48" width="18" height="11" rx="4"/></g><path d="M${57 + px} 52 H${63 + px}" stroke="${INK}" stroke-width="2.5"/>`;
+      case "mascherina": return `<rect x="46" y="74" width="28" height="9" rx="4" fill="#BFE0F2" stroke="${INK}" stroke-width="2"/><path d="M46 77 L34 60 M74 77 L86 60" stroke="#BFE0F2" stroke-width="1.6"/>`;
+      default: return "";
+    }
+  }
+
+  function avatar(p, o = {}) {
+    const av = { corpo: 1, distintivo: "nessuno", colore: "#888888", pelle: "#E0B48F", capelli: "#3B2A20", taglio: "corti", ...(p.avatar || {}) };
+    const espr = ESPRESSIONI.includes(o.espressione) ? o.espressione : "calmo";
+    const posa = POSE.includes(o.posa) ? o.posa : "in piedi";
+    const retro = posa === "voltato" || posa === "allontana";
+    const dir = o.dir === -1 ? -1 : 1;
+    const W = [44, 56, 70][av.corpo] ?? 56;
+    const s = `stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
+    const scuro = scurisci(av.colore);
+    const gambe = posa === "seduto"
+      ? `<rect x="42" y="136" width="44" height="15" rx="6" fill="#3A3F47" ${s}/><rect x="72" y="140" width="14" height="50" rx="5" fill="#3A3F47" ${s}/><rect x="56" y="140" width="13" height="50" rx="5" fill="#3A3F47" ${s}/><ellipse cx="80" cy="192" rx="10" ry="5" fill="${INK}"/><ellipse cx="63" cy="192" rx="10" ry="5" fill="${INK}"/>`
+      : `<rect x="45" y="138" width="14" height="54" rx="5" fill="#3A3F47" ${s}/><rect x="61" y="138" width="14" height="54" rx="5" fill="#3A3F47" ${s}/><ellipse cx="50" cy="193" rx="10" ry="5" fill="${INK}"/><ellipse cx="70" cy="193" rx="10" ry="5" fill="${INK}"/>`;
+    const braccia = `<rect x="${60 - W / 2 - 11}" y="90" width="13" height="50" rx="6" fill="${scuro}" ${s}/><rect x="${60 + W / 2 - 2}" y="90" width="13" height="50" rx="6" fill="${scuro}" ${s}/><circle cx="${60 - W / 2 - 4.5}" cy="142" r="6" fill="${av.pelle}" ${s}/><circle cx="${60 + W / 2 + 4.5}" cy="142" r="6" fill="${av.pelle}" ${s}/>`;
+    const busto = `<rect x="${60 - W / 2}" y="84" width="${W}" height="66" rx="16" fill="${av.colore}" ${s}/>`;
+    const collo = `<rect x="54" y="74" width="12" height="14" fill="${av.pelle}" ${s}/>`;
+    const testa = `<circle cx="60" cy="52" r="28" fill="${av.pelle}" ${s}/>`;
+    const orecchie = `<circle cx="32" cy="56" r="5" fill="${av.pelle}" ${s}/><circle cx="88" cy="56" r="5" fill="${av.pelle}" ${s}/>`;
+    let corpo;
+    if (retro) {
+      corpo = gambe + braccia + busto + collo + orecchie + testa + capelli(av, true) + distintivoTesta(av, true);
+    } else {
+      corpo = distintivoSotto(av, o.mini) + gambe + braccia + busto + distintivoCorpo(av, W) + collo + orecchie + testa + capelli(av, false) + distintivoTesta(av, false) + faccia(espr, dir) + distintivoViso(av, dir);
+    }
+    const movimento = posa === "allontana" ? `<g stroke="${INK}" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M2 100 H18"/><path d="M-4 120 H14"/><path d="M4 140 H20"/></g>` : "";
+    const ombra = o.mini ? "" : `<ellipse cx="60" cy="196" rx="34" ry="5" fill="#000" opacity=".15"/>`;
+    return `${ombra}<g>${movimento}${corpo}</g>`;
+  }
+
+  const descrizioneAvatar = (p, espr = "calmo", posa = "in piedi") => `${p.nome}, espressione ${ETICHETTE_ESPRESSIONE[espr] || espr}, ${ETICHETTE_POSA[posa] || posa}`;
+
+  function avatarSVG(p, o = {}) {
+    return `<svg viewBox="-10 -6 140 206" role="img" aria-label="${esc(descrizioneAvatar(p, o.espressione, o.posa))}" xmlns="http://www.w3.org/2000/svg">${avatar(p, o)}</svg>`;
+  }
+
+  function miniSVG(p) {
+    return `<svg viewBox="22 0 76 76" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${avatar(p, { mini: true })}</svg>`;
+  }
+
+  const SEDILE = {
+    parco: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 50}" y="296" width="100" height="10" rx="3" fill="#A0703F"/><rect x="${x - 50}" y="276" width="100" height="10" rx="3" fill="#A0703F"/><rect x="${x - 52}" y="328" width="104" height="10" rx="3" fill="#B98250"/><path d="M${x - 44} 338 V376 M${x + 44} 338 V376" stroke-width="5"/></g>`,
+    treno: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 44}" y="240" width="30" height="100" rx="10" fill="#3D6E9E"/><rect x="${x - 44}" y="326" width="90" height="16" rx="6" fill="#4F82B4"/></g>`,
+    ristorante: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 42}" y="250" width="10" height="90" fill="#7A4E2D"/><rect x="${x - 42}" y="328" width="80" height="12" rx="3" fill="#9A6A3F"/><path d="M${x - 34} 340 V378 M${x + 30} 340 V378" stroke-width="5"/></g>`,
+    cinema: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 46}" y="238" width="92" height="104" rx="14" fill="#9E2B2B"/><rect x="${x - 46}" y="324" width="92" height="20" rx="6" fill="#B83A3A"/></g>`,
+    biblioteca: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 42}" y="256" width="10" height="84" fill="#6B4A2B"/><rect x="${x - 42}" y="328" width="80" height="12" rx="3" fill="#8A6239"/><path d="M${x - 34} 340 V378 M${x + 30} 340 V378" stroke-width="5"/></g>`,
+    live: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 40}" y="246" width="80" height="94" rx="18" fill="#5B4A8C"/><rect x="${x - 44}" y="326" width="88" height="16" rx="6" fill="#6E5BA6"/><path d="M${x} 342 V372 M${x - 26} 380 H${x + 26}" stroke-width="5"/></g>`,
+  };
+
+  const FONDALE = {
+    parco: () => `<rect width="800" height="400" fill="#DCEAE2"/><rect y="292" width="800" height="108" fill="#BCD6A6"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="636" y="150" width="22" height="150" fill="#8A6239"/><circle cx="650" cy="130" r="62" fill="#8DB87A"/><circle cx="604" cy="160" r="36" fill="#9CC489"/><circle cx="700" cy="160" r="38" fill="#9CC489"/>
+      <rect x="64" y="110" width="8" height="190" fill="#6B6F76"/><rect x="52" y="96" width="32" height="20" rx="4" fill="#F4E6A1"/></g>
+      <g transform="translate(748 318)" stroke="${INK}" stroke-width="2"><ellipse cx="0" cy="10" rx="16" ry="11" fill="#9AA0A8"/><circle cx="12" cy="-4" r="8" fill="#A8AEB5"/><path d="M19 -4 L26 -2 L19 0 Z" fill="#E0A030"/><path d="M8 -8 L15 -6" stroke-width="2.5"/><circle cx="13" cy="-4" r="1.8" fill="${INK}"/></g>`,
+    piazza: () => `<rect width="800" height="400" fill="#E7E3D9"/><rect y="300" width="800" height="100" fill="#D3CBBC"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="0" y="80" width="170" height="220" fill="#E8C9A8"/><rect x="640" y="60" width="160" height="240" fill="#D9B48F"/>
+      ${[20, 70, 120].map(x => `<rect x="${x}" y="110" width="30" height="44" fill="#BCD3E6"/><rect x="${x}" y="190" width="30" height="44" fill="#BCD3E6"/>`).join("")}
+      ${[660, 710, 760].map(x => `<rect x="${x}" y="90" width="26" height="40" fill="#BCD3E6"/><rect x="${x}" y="170" width="26" height="40" fill="#BCD3E6"/>`).join("")}
+      <rect x="380" y="170" width="40" height="70" fill="#C9C3B6"/><circle cx="400" cy="150" r="18" fill="#C9C3B6"/><rect x="368" y="236" width="64" height="22" fill="#B8B1A2"/></g>
+      <path d="M392 150 L398 149 M402 147 L408 151" stroke="${INK}" stroke-width="2"/><path d="M394 160 L406 158" stroke="${INK}" stroke-width="2"/>`,
+    fermata: () => `<rect width="800" height="400" fill="#E3E8EC"/><rect y="300" width="800" height="100" fill="#C7CCD1"/><rect y="296" width="800" height="8" fill="#9AA0A8"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="150" y="120" width="440" height="14" rx="3" fill="#6B6F76"/><rect x="160" y="134" width="8" height="166" fill="#6B6F76"/><rect x="572" y="134" width="8" height="166" fill="#6B6F76"/>
+      <rect x="168" y="140" width="404" height="120" fill="#CFE3EE" opacity=".7"/>
+      <rect x="660" y="110" width="8" height="190" fill="#6B6F76"/><circle cx="664" cy="100" r="22" fill="#1F4E9C"/><rect x="420" y="146" width="140" height="30" rx="3" fill="#222"/></g>
+      <text x="664" y="106" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="14" fill="#fff">BUS</text>
+      <text x="490" y="167" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="13" fill="#F5CD4E">IN ARRIVO: forse</text>`,
+    treno: () => `<rect width="800" height="400" fill="#E9E5DB"/><rect y="320" width="800" height="80" fill="#8E949B"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="0" y="52" width="800" height="12" fill="#B8BDC3"/>
+      ${[60, 320, 580].map(x => `<rect x="${x}" y="90" width="170" height="110" rx="16" fill="#BFD8E8"/><path d="M${x} ${170} q40 -30 80 -10 q50 20 90 -14 V200 H${x} Z" fill="#A6C79A" stroke="none"/>`).join("")}
+      <rect x="350" y="16" width="100" height="26" rx="3" fill="#222"/></g>
+      <text x="400" y="34" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="12" fill="#F5CD4E">Ritardo: 40'</text>`,
+    ristorante: () => `<rect width="800" height="400" fill="#F1E5D8"/><rect y="230" width="800" height="100" fill="#D8C2A8"/><rect y="320" width="800" height="80" fill="#B99C7E"/>
+      <g stroke="${INK}" stroke-width="2"><path d="M400 0 V60" /><path d="M370 60 H430 L416 84 H384 Z" fill="#E0A030"/>
+      <rect x="610" y="250" width="150" height="16" fill="#fff"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${610 + i * 30}" y="250" width="15" height="16" fill="#C8322B" stroke="none"/>`).join("")}<path d="M620 266 V330 M750 266 V330" stroke-width="5"/>
+      <rect x="40" y="120" width="70" height="90" fill="#fff"/><path d="M48 140 H100 M48 156 H90 M48 172 H96" stroke="#9AA0A8"/>
+      <g transform="translate(700 150)"><circle cx="0" cy="0" r="16" fill="#C9CCD1"/><rect x="-16" y="16" width="32" height="70" rx="8" fill="#fff"/><path d="M-12 -2 Q-22 -2 -16 8" fill="none"/></g></g>
+      <text x="700" y="122" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="14" fill="${INK}">la la la</text>`,
+    bar: () => `<rect width="800" height="400" fill="#EADFD3"/><rect y="320" width="800" height="80" fill="#BCA58C"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="580" y="190" width="220" height="130" fill="#8A5A34"/><rect x="580" y="182" width="220" height="12" fill="#A06A3E"/>
+      <rect x="640" y="130" width="70" height="52" rx="6" fill="#B8BDC3"/><rect x="652" y="142" width="18" height="10" fill="#222"/><path d="M700 130 q6 -14 0 -26" fill="none" stroke-width="2.5"/>
+      <rect x="60" y="70" width="200" height="110" rx="4" fill="#2E3B33"/><rect x="54" y="64" width="212" height="122" rx="6" fill="none" stroke="#8A5A34" stroke-width="6"/></g>
+      <text x="160" y="112" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="17" fill="#F7F7F2">Oggi:</text>
+      <text x="160" y="140" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="17" fill="#F7F7F2">polemica del giorno</text>`,
+    palestra: () => `<rect width="800" height="400" fill="#E2E6EA"/><rect y="320" width="800" height="80" fill="#8E969E"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="250" y="60" width="300" height="200" fill="#D6E6EF"/><path d="M270 80 L330 240 M380 80 L420 180" stroke="#fff" stroke-width="6" opacity=".6"/>
+      <rect x="610" y="230" width="170" height="10" fill="#6B6F76"/>${[630, 680, 730].map(x => `<rect x="${x}" y="214" width="8" height="16" fill="#222"/><rect x="${x + 22}" y="214" width="8" height="16" fill="#222"/><path d="M${x + 8} 222 H${x + 22}" stroke-width="4"/>`).join("")}
+      <rect x="40" y="70" width="150" height="110" fill="#F2C230"/></g>
+      <text x="115" y="112" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="20" fill="${INK}">NO PAIN</text>
+      <text x="115" y="140" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="20" fill="${INK}">NO RAGIONE</text>`,
+    cinema: () => `<rect width="800" height="400" fill="#4A4E57"/><rect y="330" width="800" height="70" fill="#3A3D44"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="120" y="24" width="560" height="150" fill="#F4F2EA"/>
+      ${[40, 140, 240, 340, 440, 540, 640, 740].map(x => `<rect x="${x - 40}" y="200" width="80" height="60" rx="12" fill="#7E2626" opacity=".7"/>`).join("")}
+      <rect x="20" y="40" width="64" height="26" rx="3" fill="#3F8F5B"/></g>
+      <text x="400" y="114" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="46" fill="${INK}">SSSHHH</text>
+      <text x="52" y="58" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="11" fill="#fff">USCITA</text>`,
+    biblioteca: () => `<rect width="800" height="400" fill="#ECE5D5"/><rect y="320" width="800" height="80" fill="#B89E7C"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="20" y="40" width="210" height="260" fill="#8A6239"/><rect x="570" y="40" width="210" height="260" fill="#8A6239"/>
+      ${[60, 120, 180, 240].flatMap(y => [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<rect x="${30 + i * 22}" y="${y - 10}" width="16" height="48" fill="${["#C8322B", "#1F4E9C", "#3F8F5B", "#E0A030", "#7A5C99"][(i + y / 60) % 5]}"/><rect x="${580 + i * 22}" y="${y - 10}" width="16" height="48" fill="${["#3F8F5B", "#E0A030", "#C8322B", "#7A5C99", "#1F4E9C"][(i + y / 60) % 5]}"/>`)).join("")}
+      <g transform="rotate(-5 400 80)"><rect x="330" y="56" width="140" height="44" fill="#fff"/></g>
+      <path d="M400 180 V250" stroke-width="3"/><path d="M372 180 Q400 150 428 180 Z" fill="#3F8F5B"/><rect x="380" y="250" width="40" height="8" fill="#6B4A2B"/></g>
+      <text x="400" y="88" text-anchor="middle" transform="rotate(-5 400 80)" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="24" fill="${INK}">SILENZIO</text>`,
+    sagrato: () => `<rect width="800" height="400" fill="#E3E6EE"/><rect y="310" width="800" height="90" fill="#CFC8BC"/>
+      <g stroke="${INK}" stroke-width="2"><path d="M180 300 V110 L400 30 L620 110 V300 Z" fill="#EEE3CF"/><path d="M360 300 V200 Q400 150 440 200 V300 Z" fill="#7A4E2D"/><circle cx="400" cy="110" r="26" fill="#BCD3E6"/>
+      <rect x="660" y="40" width="80" height="260" fill="#E6D8BE"/><path d="M650 40 L700 0 L750 40 Z" fill="#C9B48F"/>
+      <path d="M684 70 Q700 52 716 70 L720 100 H680 Z" fill="#E0A030"/>
+      <path d="M160 300 H640 M150 308 H650" stroke-width="3"/></g>
+      <path d="M690 82 L697 82 M703 82 L710 82" stroke="${INK}" stroke-width="2.5"/>`,
+    live: () => `<rect width="800" height="400" fill="#E7E1EE"/><rect y="330" width="800" height="70" fill="#C9BFD6"/>
+      <g stroke="${INK}" stroke-width="2"><rect x="10" y="10" width="610" height="380" rx="18" fill="none" stroke-width="4"/>
+      <rect x="630" y="10" width="160" height="380" rx="12" fill="#fff"/><rect x="24" y="22" width="64" height="26" rx="6" fill="#C8322B"/>
+      <rect x="140" y="40" width="300" height="80" fill="#D6CCE4"/></g>
+      <text x="56" y="40" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="14" fill="#fff">● LIVE</text>
+      <g font-family="Atkinson Hyperlegible, sans-serif" font-size="13" fill="${INK}">
+      <text x="642" y="40" font-weight="700">Chat</text><text x="642" y="70">tizio: RAGA</text><text x="642" y="96">caio: F</text><text x="642" y="122">mod: occhio...</text><text x="642" y="148">anon: 📢📢📢</text><text x="642" y="174">sempronio: ahahah</text></g>`,
+  };
+
+  function bambino(x, s, colore = "#E0A030") {
+    return `<g transform="translate(${x - 60 * s} ${380 - 200 * s}) scale(${s})">${avatar({ nome: "bambino", avatar: { corpo: 0, colore, pelle: "#F1D3B8", capelli: "#6B4A2B", taglio: "ricci" } }, { espressione: "calmo" })}</g>`;
+  }
+
+  function folla(n, viva) {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const x = 40 + ((i * 97) % 720);
+      const y = 248 + (i % 3) * 8;
+      out.push(`<g opacity="${viva ? 0.9 : 0.55}" fill="#B8BCC2" stroke="#8E949B" stroke-width="2"><circle cx="${x}" cy="${y}" r="14"/><rect x="${x - 20}" y="${y + 14}" width="40" height="50" rx="14"/></g>`);
+    }
+    return out.join("");
+  }
+
+  const ICONE = {
+    luogo: `<path d="M12 2 C7 2 4 6 4 10 c0 6 8 12 8 12 s8 -6 8 -12 c0 -4 -3 -8 -8 -8 Z" fill="currentColor"/><circle cx="12" cy="10" r="3" fill="#fff"/>`,
+    condotta: `<path d="M3 5 h18 v11 h-9 l-5 4 v-4 h-4 Z" fill="currentColor"/><path d="M8 10 h8" stroke="#fff" stroke-width="2"/>`,
+    volume: `<path d="M3 9 h4 l5 -4 v14 l-5 -4 h-4 Z" fill="currentColor"/><path d="M15 8 q3 4 0 8 M18 5 q6 7 0 14" fill="none" stroke="currentColor" stroke-width="2"/>`,
+    frequenza: `<path d="M5 12 a7 7 0 0 1 12 -5 l2 -2 v6 h-6 l2 -2 a4 4 0 0 0 -7 3 Z M19 12 a7 7 0 0 1 -12 5 l-2 2 v-6 h6 l-2 2 a4 4 0 0 0 7 -3 Z" fill="currentColor"/>`,
+    intento: `<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/>`,
+    bambini: `<circle cx="12" cy="6" r="3.5" fill="currentColor"/><path d="M7 21 v-7 a5 5 0 0 1 10 0 v7 Z" fill="currentColor"/>`,
+    allontanarsi: `<path d="M5 3 h10 v18 h-10 Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 12 h9 m-3 -3 l3 3 l-3 3" fill="none" stroke="currentColor" stroke-width="2"/>`,
+    terzo: `<path d="M12 2 l8 3 v6 c0 5 -4 9 -8 11 c-4 -2 -8 -6 -8 -11 v-6 Z" fill="currentColor"/><path d="M8 12 l3 3 l5 -6" fill="none" stroke="#fff" stroke-width="2"/>`,
+    pubblico: `<circle cx="7" cy="8" r="3" fill="currentColor"/><circle cx="17" cy="8" r="3" fill="currentColor"/><circle cx="12" cy="6" r="3.2" fill="currentColor"/><path d="M2 20 a5 5 0 0 1 10 0 Z M12 20 a5 5 0 0 1 10 0 Z M6 18 a6 6 0 0 1 12 0 Z" fill="currentColor"/>`,
+    durata: `<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7 v5 l4 2" fill="none" stroke="currentColor" stroke-width="2"/>`,
+  };
+  const icona = nome => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONE[nome] || ""}</svg>`;
+
+  const SLOT = { autore: 300, osservatore: 520, amici: [190, 92], terzo: 650, via: 752 };
+
+  function posizioni(sit, passo) {
+    const pos = { [sit.autore.id]: SLOT.autore, [sit.osservatore.id]: SLOT.osservatore };
+    sit.amici.forEach((a, i) => { pos[a.id] = SLOT.amici[i]; });
+    for (const [id, posa] of Object.entries(passo.pose || {})) if (posa === "allontana") pos[id] = SLOT.via;
+    pos.terzo = SLOT.terzo;
+    pos.folla = 420;
+    return pos;
+  }
+
+  function scena(sit, passo, terzoPg) {
+    const L = sit.luogo, m = sit.modulatori;
+    const pos = posizioni(sit, passo);
+    const parti = [`<g data-testid="scena-luogo" data-luogo="${L.id}" aria-hidden="true">${(FONDALE[L.id] || FONDALE.parco)()}</g>`];
+    parti.push(`<g aria-hidden="true">${folla([0, 4, 9][m.pubblico] + (passo.folla ? 3 : 0), passo.folla)}</g>`);
+    const pg = [
+      { p: sit.autore, ruolo: "autore", tag: "A" },
+      { p: sit.osservatore, ruolo: "osservatore", tag: "B" },
+      ...sit.amici.map(a => ({ p: a, ruolo: "amico" })),
+    ];
+    if (L.seduti && SEDILE[L.id]) {
+      for (const { p } of pg) if ((passo.pose?.[p.id] || "seduto") === "seduto") parti.push(`<g aria-hidden="true">${SEDILE[L.id](pos[p.id])}</g>`);
+    }
+    if (m.bambini === 1) parti.push(`<g aria-hidden="true">${bambino(712, 0.42)}${bambino(770, 0.38, "#5A7FBF")}</g>`);
+    if (m.bambini === 2) parti.push(`<g aria-hidden="true">${bambino(420, 0.45)}${bambino(452, 0.4, "#5A7FBF")}</g>`);
+    if (sit.condotta.id === "fumare" && !passo.fine) parti.push(`<g aria-hidden="true" fill="#C9CCD1" opacity=".75"><circle cx="350" cy="200" r="14"/><circle cx="385" cy="185" r="18"/><circle cx="425" cy="190" r="16"/><circle cx="460" cy="200" r="12"/></g>`);
+    if (["musica", "telefonata"].includes(sit.condotta.id) || m.volume >= 2) {
+      const archi = Math.max(1, m.volume + 1);
+      parti.push(`<g aria-hidden="true" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" opacity=".7">${Array.from({ length: archi }, (_, i) => `<path d="M${352 + i * 10} ${208 - i * 6} q${8 + i * 4} ${16 + i * 6} 0 ${32 + i * 12}"/>`).join("")}</g>`);
+    }
+    for (const { p, ruolo, tag } of pg) {
+      const x = pos[p.id];
+      const posa = passo.pose?.[p.id] || "in piedi";
+      const espr = passo.espressioni?.[p.id] || "calmo";
+      const dir = x < 410 ? 1 : -1;
+      const s = ruolo === "amico" ? 0.9 : 1;
+      const ty = 380 - 200 * s + (posa === "seduto" ? -6 : 0);
+      const nome = tag ? `${tag} · ${p.nome}` : p.nome;
+      parti.push(`<g data-testid="personaggio" data-id="${esc(p.id)}" data-ruolo="${ruolo}" data-espressione="${espr}" data-posa="${posa}" role="img" aria-label="${esc((tag ? tag + ", " : "") + descrizioneAvatar(p, espr, posa))}">
+        <g transform="translate(${x - 60 * s} ${ty}) scale(${s})" ${posa === "allontana" ? 'opacity=".85"' : ""}>${avatar(p, { espressione: espr, posa, dir })}</g>
+        <text x="${x}" y="396" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="15" fill="${INK}" stroke="#fff" stroke-width="4" paint-order="stroke">${esc(nome)}</text></g>`);
+    }
+    if (passo.terzo && terzoPg) {
+      const nome = sit.terzo ? sit.terzo[0].toUpperCase() + sit.terzo.slice(1) : terzoPg.nome;
+      parti.push(`<g data-testid="personaggio" data-id="terzo" data-ruolo="terzo" data-espressione="calmo" data-posa="in piedi" role="img" aria-label="${esc(descrizioneAvatar({ nome }, "calmo"))}">
+        <g transform="translate(${SLOT.terzo - 60} 180)">${avatar(terzoPg, { espressione: "calmo", dir: -1 })}</g>
+        <text x="${SLOT.terzo}" y="396" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="15" fill="${INK}" stroke="#fff" stroke-width="4" paint-order="stroke">${esc(nome)}</text></g>`);
+    }
+    return `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Scena: ${esc(L.nome)}" xmlns="http://www.w3.org/2000/svg">${parti.join("")}</svg>`;
+  }
+
+  return Object.freeze({ ESPRESSIONI, POSE, DISTINTIVI, TAGLI, FONDALE, SLOT, esc, avatar, avatarSVG, miniSVG, descrizioneAvatar, scena, posizioni, icona, ICONE });
 })();
 </script>
 <script id="app">
-const { LIVELLI, generaSituazione } = Motore;
-const stato = { seed: null, situazione: null, livello: 0, storico: [], voti: [], finito: false };
+(() => {
+  const M = Motore, A = Asset, esc = A.esc;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const main = $("#contenuto");
 
-function render() {
-  const sem = document.querySelector(".semaforo");
-  sem.innerHTML = LIVELLI.map((nome, i) =>
-    `<li class="luce" data-testid="semaforo-luce" data-livello="${i}" data-accesa="${i <= stato.livello}" aria-label="Livello ${i}: ${nome}">${i}</li>`
-  ).join("");
-  if (!stato.situazione) return;
-  document.querySelector('[data-testid="didascalia"]').textContent = `${stato.situazione.luogo}. Tutto tranquillo. Per ora.`;
-  document.querySelector('[data-testid="seed"]').textContent = `Caso #s-${stato.seed}`;
-}
+  const STORAGE_KEY = "chi-ha-ragione:v1";
+  let memoria = {};
+  const storage = {
+    leggi() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const v = raw ? JSON.parse(raw) : {};
+        return v && typeof v === "object" ? v : {};
+      } catch {
+        return { ...memoria };
+      }
+    },
+    scrivi(dati) {
+      memoria = { ...dati };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(dati)); } catch { }
+    },
+    reset() {
+      memoria = {};
+      try { localStorage.removeItem(STORAGE_KEY); } catch { }
+    },
+  };
+  let salvati = storage.leggi();
+  const salva = patch => { salvati = { ...salvati, ...patch }; storage.scrivi(salvati); };
 
-function nuova(seed = Math.floor(Math.random() * 900000) + 100000) {
-  Object.assign(stato, { seed, situazione: generaSituazione(seed), livello: 0, storico: [], voti: [], finito: false });
-  if (location.hash !== `#s-${seed}`) history.replaceState(null, "", `#s-${seed}`);
-  render();
-}
+  const clona = x => JSON.parse(JSON.stringify(x));
+  const predefiniti = () => clona(M.PERSONAGGI);
+  function personaggiValidi(lista) {
+    if (!Array.isArray(lista) || lista.filter(p => p && p.ruolo !== "terzo").length < 3) return null;
+    return lista.filter(p => p && p.id && p.tratti).map(p => ({ esasperazione: 1, ...p, tratti: { ...Object.fromEntries(M.TRATTI.map(k => [k, 0.5])), ...p.tratti } }));
+  }
+  let personaggi = personaggiValidi(salvati.personaggi) || predefiniti();
+  const salvaPersonaggi = () => salva({ personaggi });
+  const opz = () => ({ personaggi });
+  const terzoPg = () => personaggi.find(p => p.ruolo === "terzo") || M.PERSONAGGI.find(p => p.ruolo === "terzo");
 
-document.querySelector('[data-testid="btn-nuova"]').addEventListener("click", () => nuova());
+  const LIV_DOMANDA = Object.fromEntries(Object.entries(M.DOMANDE).flatMap(([k, v]) => v.map(d => [d.id, +k])));
+  const COLORE_LIVELLO = l => (l <= 1 ? "verde" : l <= 4 ? "giallo" : "rosso");
 
-function daHash() {
-  const m = location.hash.match(/^#s-(\d+)$/);
-  if (m && +m[1] !== stato.seed) nuova(+m[1]);
-  else if (!m) render();
-}
-addEventListener("hashchange", daHash);
-daHash();
+  const stato = {
+    vista: "gioco",
+    seed: null, situazione: null, percorso: [], livello: 0, voti: [], finito: false,
+    votato: false, bozza: {}, costruita: null, registrata: false,
+  };
+  const storico = () => stato.percorso.slice(0, stato.livello + 1);
+  const passoCorrente = () => stato.percorso[stato.livello];
 
-window.__CHR__ = {
-  version: "0.0.1-skeleton",
-  stato: () => structuredClone(stato),
-  nuova,
-  generaSituazione,
-};
+  function nuovoSeed() {
+    return 100000 + Math.floor(Math.random() * 900000);
+  }
+
+  function avviaSituazione(sit, { seed = sit.seed, costruita = null } = {}) {
+    Object.assign(stato, {
+      vista: "gioco", seed, situazione: sit, percorso: M.simulaPercorso(sit, opz()),
+      livello: 0, voti: [], finito: false, votato: false, bozza: {}, costruita, registrata: false,
+    });
+  }
+
+  function nuova(seed = nuovoSeed()) {
+    seed = Math.max(1, Math.floor(+seed) || 1);
+    avviaSituazione(M.generaSituazione(seed, opz()), { seed });
+    imposta(`#s-${seed}`);
+    render();
+    annunciaPasso();
+  }
+
+  function avviaCostruita(params) {
+    const seed = nuovoSeed();
+    avviaSituazione(M.costruisciSituazione({ ...params, seed }, opz()), { seed, costruita: params });
+    imposta("#gioco");
+    render();
+    annunciaPasso();
+  }
+
+  function rigioca() {
+    if (stato.costruita) {
+      avviaSituazione(M.costruisciSituazione({ ...stato.costruita, seed: stato.seed }, opz()), { seed: stato.seed, costruita: stato.costruita });
+      render();
+      annunciaPasso();
+    } else nuova(stato.seed);
+  }
+
+  function avanti() {
+    if (!stato.situazione || stato.finito) return;
+    if (stato.livello < stato.percorso.length - 1) {
+      stato.livello++;
+      stato.votato = false;
+      stato.bozza = {};
+      render();
+      annunciaPasso();
+    } else {
+      stato.finito = true;
+      registraPartita();
+      render();
+      annuncia("Fine dei giochi. Ecco la sentenza.");
+      $("[data-testid=finale]")?.focus();
+    }
+  }
+
+  function vota(risposte = {}) {
+    if (!stato.situazione || stato.finito) return;
+    const lv = stato.livello;
+    const perche = typeof risposte.perche === "string" ? risposte.perche.slice(0, 140) : "";
+    stato.voti = stato.voti.filter(v => v.livello !== lv);
+    for (const d of M.domande(lv, stato.situazione)) {
+      if (risposte[d.id] === undefined) continue;
+      const valore = d.tipo === "scala" ? +risposte[d.id] : String(risposte[d.id]);
+      stato.voti.push({ livello: lv, domanda: d.id, valore, ...(perche ? { perche } : {}) });
+    }
+    stato.votato = true;
+    render();
+  }
+
+  function registraPartita() {
+    if (stato.registrata || !stato.voti.length) return;
+    stato.registrata = true;
+    const sim = M.somiglianza(stato.voti, stato.situazione, stato.percorso, personaggi);
+    const tot = { ...(salvati.somiglianza || {}) };
+    for (const s of sim) if (s.distanza != null) {
+      const prev = tot[s.id] || { d: 0, n: 0 };
+      tot[s.id] = { d: +(prev.d + s.distanza).toFixed(3), n: prev.n + 1 };
+    }
+    salva({ somiglianza: tot, partite: (salvati.partite || 0) + 1 });
+  }
+
+  let annunciTimer;
+  function annuncia(testo) {
+    const el = $("[data-testid=annunci]");
+    el.textContent = "";
+    clearTimeout(annunciTimer);
+    annunciTimer = setTimeout(() => { el.textContent = testo; }, 50);
+  }
+  function annunciaPasso() {
+    const p = passoCorrente();
+    if (!p) return;
+    const nomi = nomeChi();
+    annuncia(`Livello ${p.livello}, ${p.nome}. ` + p.testi.map(t => (t.chi === "narratore" ? "" : `${nomi(t.chi)} dice: `) + M.testoPiano(t.testo)).join(" "));
+  }
+
+  let toastTimer;
+  function toast(testo) {
+    const el = $("[data-testid=toast]");
+    el.textContent = testo;
+    el.classList.add("visibile");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("visibile"), 2600);
+  }
+
+  async function condividi() {
+    const url = `${location.origin}${location.pathname}#s-${stato.seed}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("Link copiato. Ora fai litigare qualcuno.");
+    } catch {
+      toast(`Copia questo link: ${url}`);
+    }
+  }
+
+  function imposta(hash) {
+    if (location.hash !== hash) history.replaceState(null, "", hash);
+  }
+
+  const VISTE = ["gioco", "laboratorio", "indovina", "costruisci", "personaggi"];
+  function router() {
+    const h = location.hash.slice(1);
+    const m = h.match(/^s-(\d+)$/);
+    if (m) {
+      if (+m[1] !== stato.seed || stato.costruita || stato.vista !== "gioco") nuova(+m[1]);
+      else { stato.vista = "gioco"; render(); }
+      return;
+    }
+    stato.vista = VISTE.includes(h) ? h : "gioco";
+    if (stato.vista === "gioco" && stato.situazione && !stato.costruita) imposta(`#s-${stato.seed}`);
+    render();
+  }
+
+  const nomeChi = () => {
+    const s = stato.situazione;
+    const mappa = Object.fromEntries([s.autore, s.osservatore, ...s.amici].map(p => [p.id, p.nome]));
+    return chi => (chi === "terzo" ? cap(s.terzo || "il terzo") : chi === "folla" ? "Qualcuno tra il pubblico" : mappa[chi] || chi);
+  };
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+
+  function testoHTML(testo, sit) {
+    return M.segmenti(testo).map(seg => {
+      if (seg.tipo === "testo") return esc(seg.testo);
+      const etichetta = { bestemmia: ["#@§!", "⚡ BIIP", "CENSURATO"][seg.intensita - 1], parolaccia: "#@!", insulto: "BIIP" }[seg.parola];
+      const alt = { bestemmia: `bestemmia censurata, intensità ${seg.intensita}`, parolaccia: "parolaccia censurata", insulto: "insulto censurato" }[seg.parola];
+      const aureola = sit?.luogo.id === "sagrato" && seg.parola === "bestemmia" ? " aureola" : "";
+      return `<span class="censura${aureola}" data-testid="censura" data-parola="${seg.parola}" data-intensita="${seg.intensita}" role="img" aria-label="${alt}">${etichetta}</span>`;
+    }).join("");
+  }
+
+  function fumettiHTML(sit, passo) {
+    const pos = A.posizioni(sit, passo);
+    const nomi = nomeChi();
+    let k = 0;
+    return passo.testi.map(t => {
+      const contenuto = `<span class="chi">${esc(nomi(t.chi))}</span><span class="testo">${testoHTML(t.testo, sit)}</span>`;
+      if (t.chi === "narratore") return `<div class="fumetto-pos narr"><p class="fumetto" data-testid="fumetto" data-tipo="narratore" data-chi="narratore">${contenuto}</p></div>`;
+      const x = pos[t.chi] ?? 400;
+      const sinistra = x < 410;
+      const tx = t.chi === "folla" ? "-50%" : sinistra ? "-24%" : "-76%";
+      const bottom = 54 + k++ * 17;
+      return `<div class="fumetto-pos" style="left:${(x / 8).toFixed(1)}%;bottom:${bottom}%;--tx:translateX(${tx})"><p class="fumetto" data-testid="fumetto" data-tipo="${t.tipo}" data-chi="${esc(t.chi)}" style="--coda:${t.chi === "folla" ? 46 : sinistra ? 20 : 74}%">${contenuto}</p></div>`;
+    }).join("");
+  }
+
+  function scenaHTML(sit, passo) {
+    return `<div class="scena-box" data-testid="scena"><div class="scena-svg">${A.scena(sit, passo, terzoPg())}</div><div class="fumetti">${fumettiHTML(sit, passo)}</div></div>`;
+  }
+
+  function semaforoHTML() {
+    const p = passoCorrente();
+    return `<ol class="semaforo" aria-label="Semaforo dell'escalation">${M.LIVELLI.map((nome, i) => {
+      const accesa = !!stato.situazione && i <= stato.livello;
+      const corrente = accesa && i === stato.livello;
+      const cede = corrente && p?.fine && p?.cede;
+      return `<li class="luce${corrente ? " corrente" : ""}${cede ? " cede" : ""}" data-testid="semaforo-luce" data-livello="${i}" data-accesa="${accesa}" data-colore="${COLORE_LIVELLO(i)}" aria-label="Livello ${i}: ${nome}${corrente ? " (attuale)" : accesa ? " (superato)" : ""}"${corrente ? ' aria-current="step"' : ""}>${i}</li>`;
+    }).join("")}</ol>`;
+  }
+
+  function variabiliHTML(sit) {
+    const m = sit.modulatori, L = sit.luogo, MO = M.MODULATORI;
+    const allont = L.allontanarsi >= 0.8 ? "facile andarsene" : L.allontanarsi >= 0.4 ? "andarsene si può" : L.allontanarsi > 0 ? "difficile andarsene" : "impossibile andarsene";
+    const chips = [
+      ["luogo", "luogo", "Luogo", L.nome],
+      ["condotta", "condotta", "Condotta", sit.condotta.nome],
+      ["volume", "volume", "Volume", MO.volume.valori[m.volume]],
+      ["frequenza", "frequenza", "Frequenza", MO.frequenza.valori[m.frequenza]],
+      ["intento", "intento", "Intento", m.intento],
+      ["bambini", "bambini", "Bambini", MO.bambini.valori[m.bambini]],
+      ["allontanarsi", "allontanarsi", "Uscita", allont],
+      ["terzo", "terzo", "Terzo", sit.terzo ? `c'è ${sit.terzo}` : "nessuno"],
+      ["pubblico", "pubblico", "Pubblico", MO.pubblico.valori[m.pubblico]],
+      ["durata", "durata", "Durata", L.durata >= 0.8 ? "lunga" : L.durata >= 0.4 ? "media" : "breve"],
+    ];
+    return `<ul class="variabili" aria-label="Variabili attive">${chips.map(([nome, ic, et, val]) => `<li class="chip" data-testid="variabile" data-nome="${nome}" title="${esc(et)}: ${esc(val)}">${A.icona(ic)}<span class="nome">${esc(et)}:</span> <b>${esc(val)}</b></li>`).join("")}</ul>`;
+  }
+
+  const pgPerId = id => personaggi.find(p => p.id === id);
+
+  function lentiPer(livello, domandaId) {
+    return M.lenti(stato.situazione, stato.percorso, livello, domandaId, personaggi);
+  }
+
+  function domandaHTML(d, livello, votoUtente, mostraLenti) {
+    const scelto = votoUtente ?? stato.bozza[d.id];
+    const lenti = mostraLenti ? lentiPer(livello, d.id) : [];
+    const n = d.opzioni.length;
+    return `<fieldset class="domanda" data-testid="voto-domanda" data-id="${d.id}" data-tipo="${d.tipo}">
+      <legend>${esc(d.testo)}</legend>
+      <div class="opzioni" data-tipo="${d.tipo}" style="--n:${n}" role="radiogroup" aria-label="${esc(d.testo)}">
+        ${d.opzioni.map(o => {
+          const sel = scelto !== undefined && String(scelto) === String(o.valore);
+          const chi = lenti.filter(l => String(l.valore) === String(o.valore));
+          return `<div class="opzione-col">
+            <button type="button" class="opzione" role="radio" aria-checked="${sel}" data-testid="voto-opzione" data-azione="opzione" data-domanda="${d.id}" data-valore="${esc(o.valore)}"${votoUtente !== undefined ? " disabled" : ""}>${esc(o.etichetta)}</button>
+            ${mostraLenti ? `${sel ? '<span class="tu">▲ tu</span>' : ""}<div class="lenti-col">${chi.map(l => {
+              const p = pgPerId(l.id);
+              return `<span class="lente" data-testid="lente" data-id="${l.id}" data-valore="${esc(l.valore)}" title="${esc(p.nome)}: «${esc(p.lente)}»" role="img" aria-label="${esc(p.nome)} voterebbe ${esc(o.etichetta)}">${A.miniSVG(p)}</span>`;
+            }).join("")}</div>` : ""}
+          </div>`;
+        }).join("")}
+      </div>
+      ${d.tipo === "scala" ? `<div class="estremi"><span>1 · ${esc(d.estremi[0])}</span><span>5 · ${esc(d.estremi[1])}</span></div>` : ""}
+    </fieldset>`;
+  }
+
+  function pannelloVotoHTML() {
+    const lv = stato.livello, sit = stato.situazione;
+    const ds = M.domande(lv, sit);
+    const voti = Object.fromEntries(stato.voti.filter(v => v.livello === lv).map(v => [v.domanda, v.valore]));
+    const perche = stato.voti.find(v => v.livello === lv && v.perche)?.perche || "";
+    const completo = ds.every(d => stato.bozza[d.id] !== undefined);
+    const ultimo = lv === stato.percorso.length - 1;
+    const legenda = stato.votato ? `<ul class="legenda-lenti" aria-label="Le lenti dei personaggi">${M.principali(personaggi).map(p => `<li title="«${esc(p.lente)}»">${A.miniSVG(p)} ${esc(p.nome)}</li>`).join("")}</ul>` : "";
+    return `<section class="scheda" data-testid="voto-pannello" data-livello="${lv}" data-colore="${COLORE_LIVELLO(lv)}" aria-labelledby="titolo-voto">
+      <h2 id="titolo-voto">${stato.votato ? "Il tuo voto e le lenti" : "Il tuo voto"}</h2>
+      ${legenda}
+      ${ds.map(d => domandaHTML(d, lv, stato.votato ? voti[d.id] : undefined, stato.votato)).join("")}
+      <div class="perche">
+        <label for="perche">Perché? <span class="nota">(facoltativo)</span></label>
+        <input id="perche" type="text" maxlength="140" data-testid="voto-perche" value="${esc(perche)}" ${stato.votato ? "disabled" : ""} placeholder="In 140 caratteri, come un vecchio tweet">
+        <span class="contatore" data-contatore>${perche.length}/140</span>
+      </div>
+      <div class="riga-azioni">
+        ${stato.votato
+          ? `<p class="nota" data-testid="voto-confermato">${vicinanzaTesto(lv)}</p>`
+          : `<button type="button" class="btn btn-sec" data-azione="vota" data-testid="btn-vota"${completo ? "" : " disabled"}>Emetti il voto</button>`}
+        <button type="button" class="btn btn-grande" data-azione="avanti" data-testid="btn-avanti">
+          <span class="freccia" aria-hidden="true">${ultimo ? "⚖" : "➜"}</span><span>${ultimo ? "La sentenza" : "E poi?"}<small>${ultimo ? "Vai alla schermata finale" : "Cosa succede dopo"}</small></span>
+        </button>
+      </div>
+    </section>`;
+  }
+
+  function vicinanzaTesto(lv) {
+    const voti = stato.voti.filter(v => v.livello === lv);
+    if (!voti.length) return "";
+    const s = M.somiglianza(voti, stato.situazione, stato.percorso, personaggi);
+    const vicini = s.filter(x => x.distanza === s[0].distanza).map(x => x.nome);
+    return `A questo livello la pensi come ${vicini.join(", ")}.`;
+  }
+
+  const BATTUTE_SOMIGLIANZA = {
+    marco: "Diplomatico. Probabilmente chiedi scusa anche ai lampioni.",
+    luca: "Credi nel dialogo. E forse anche in altro.",
+    gigi: "Hai già chiamato il gestore, vero?",
+    sara: "Non stavi parlando con loro, e si vede.",
+    ettore: "Il prete del quartiere ti saluta. Dall'altra parte della strada.",
+  };
+
+  function finaleHTML() {
+    const sit = stato.situazione, percorso = stato.percorso;
+    const nomi = nomeChi();
+    const et = M.etichettaCaso(stato.voti, sit, percorso, personaggi);
+    const sim = M.somiglianza(stato.voti, sit, percorso, personaggi);
+    const tot = salvati.somiglianza || {};
+    const medie = M.principali(personaggi).map(p => ({ p, m: tot[p.id]?.n ? tot[p.id].d / tot[p.id].n : null })).filter(x => x.m != null).sort((a, b) => a.m - b.m);
+    const top = stato.voti.length ? pgPerId(sim[0].id) : null;
+    const richiestaFatta = percorso.length >= 3;
+    const domandeVotate = stato.voti.map(v => v.domanda);
+    const tutteDomande = Object.values(M.DOMANDE).flat().filter(d => domandeVotate.includes(d.id));
+    const compilata = id => M.domande(LIV_DOMANDA[id], sit).find(x => x.id === id);
+    const etichettaValore = (d, v) => {
+      if (v === undefined || v === null) return "–";
+      if (d.tipo === "scala") return String(v);
+      if (d.tipo === "oggetto") return v === "identita" ? "Identità" : "Condotta";
+      const o = compilata(d.id).opzioni.find(o => String(o.valore) === String(v));
+      return o ? o.etichetta.replace(/^([AB]) · .*/, "$1") : String(v);
+    };
+    return `<section class="finale" data-testid="finale" tabindex="-1" aria-labelledby="titolo-finale">
+      <h2 id="titolo-finale" class="sr-only">Schermata finale</h2>
+      <p class="timbro" aria-label="Sentenza numero ${stato.seed}">Sentenza n. ${stato.seed}</p>
+      <p class="etichetta" data-testid="finale-etichetta">${esc(cap(et))}.</p>
+      ${sit.identita && richiestaFatta ? `<div class="avviso-identita" data-testid="finale-identita" role="note"><strong>⚠ Attenzione:</strong> qui non si chiedeva di cambiare cosa fai, ma cosa sei. La richiesta riguardava un'identità (${esc(sit.condotta.nome.toLowerCase())}), non una condotta. Cambia tutto.</div>` : ""}
+      <div class="somiglia" data-testid="finale-somiglianza">
+        ${top ? `${A.avatarSVG(top, { espressione: "sollevato" })}<div><h3>In questa partita somigli a ${esc(top.nome)}</h3><p>${esc(BATTUTE_SOMIGLIANZA[top.id] || `«${top.lente}»`)}</p>${medie.length ? `<p class="nota">Nel totale delle partite (${salvati.partite || 0}) somigli di più a <b>${esc(medie[0].p.nome)}</b>.</p>` : ""}</div>`
+          : `<div><h3>Nessun voto, nessuna somiglianza</h3><p>Hai guardato senza giudicare. Molto zen. O molto furbo.</p></div>`}
+      </div>
+      <div>
+        <h3>Il percorso</h3>
+        <ol class="percorso">${percorso.map(p => `<li><span class="n" data-colore="${p.fine && p.cede ? "verde" : COLORE_LIVELLO(p.livello)}">${p.livello}</span><div><b>${esc(p.nome)}</b>: ${esc(p.sintesi)}${p.testi.find(t => t.chi !== "narratore") ? ` <q>${esc(M.testoPiano(p.testi.find(t => t.chi !== "narratore").testo))}</q> <span class="nota">(${esc(nomi(p.testi.find(t => t.chi !== "narratore").chi))})</span>` : ""}</div></li>`).join("")}</ol>
+      </div>
+      ${tutteDomande.length ? `<div>
+        <h3>I tuoi voti e le lenti</h3>
+        <p class="nota">A = ${esc(sit.autore.nome)} · B = ${esc(sit.osservatore.nome)}. In verde i voti uguali al tuo.</p>
+        <div class="tabella-wrap"><table class="confronto" data-testid="finale-confronto">
+          <thead><tr><th scope="col">Domanda</th><th scope="col">Tu</th>${M.principali(personaggi).map(p => `<th scope="col">${esc(p.nome)}</th>`).join("")}</tr></thead>
+          <tbody>${tutteDomande.map(d => {
+            const tuo = stato.voti.find(v => v.domanda === d.id);
+            return `<tr><th scope="row">${esc(compilata(d.id).testo)}</th><td><b>${esc(etichettaValore(d, tuo?.valore))}</b>${tuo?.perche ? `<br><span class="nota">«${esc(tuo.perche)}»</span>` : ""}</td>${M.principali(personaggi).map(p => {
+              const v = M.votoPrevisto(p, sit, d.id, percorso);
+              return `<td class="${String(v) === String(tuo?.valore) ? "uguale" : ""}">${esc(etichettaValore(d, v))}${String(v) === String(tuo?.valore) ? " ✓" : ""}</td>`;
+            }).join("")}</tr>`;
+          }).join("")}</tbody>
+        </table></div>
+      </div>` : ""}
+      <div class="pulsanti">
+        <button type="button" class="btn" data-azione="nuova" data-testid="btn-finale-nuova">Nuova grana</button>
+        <button type="button" class="btn btn-sec" data-azione="rigioca" data-testid="btn-rigioca">Riapri il processo</button>
+        <button type="button" class="btn btn-sec" data-azione="cambia-variabile" data-testid="btn-cambia-variabile">E se invece…?</button>
+        ${stato.costruita ? "" : `<button type="button" class="btn btn-sec" data-azione="condividi" data-testid="btn-condividi">Fai litigare un amico</button>`}
+      </div>
+      <div class="riga-azioni"><span></span><button type="button" class="btn btn-grande" data-azione="avanti" data-testid="btn-avanti" aria-disabled="true"><span class="freccia" aria-hidden="true">■</span><span>Fine dei giochi<small>La scena è chiusa</small></span></button></div>
+    </section>`;
+  }
+
+  function vistaGioco() {
+    if (!stato.situazione) {
+      return `${semaforoHTML()}<div class="colonna"><section class="intro" data-testid="intro">
+        <span class="cartello">Tutto tranquillo. Per ora.</span>
+        <h2>Benvenuto al tribunale del marciapiede</h2>
+        <p>Una scena in un luogo pubblico, qualcuno che dà fastidio, qualcuno che chiede. Tu giudichi livello per livello, su piani separati: è lecito? È ragionevole? Sarebbe stato cortese?</p>
+        <p>Poi scopri come avrebbero votato Marco, Luca, Gigi, Sara ed Ettore. Spoiler: non sono d'accordo.</p>
+        <p class="seed" data-testid="seed"></p>
+        <div class="pulsanti"><button type="button" class="btn btn-grande" data-azione="nuova" data-testid="btn-intro-nuova">Nuova grana</button><a class="btn btn-sec" href="#laboratorio">Prova il laboratorio</a></div>
+      </section></div>`;
+    }
+    const sit = stato.situazione, p = passoCorrente();
+    return `${semaforoHTML()}<div class="colonna">
+      <div class="intestazione-scena">
+        <h2 data-testid="livello-nome">Livello ${p.livello} · ${esc(p.nome)}</h2>
+        <p class="seed" data-testid="seed">${stato.costruita ? "Caso costruito a mano" : `Caso #s-${stato.seed} <button type="button" data-azione="condividi" title="Copia il link a questo caso">copia link</button>`}</p>
+      </div>
+      ${scenaHTML(sit, p)}
+      ${variabiliHTML(sit)}
+      ${stato.finito ? finaleHTML() : pannelloVotoHTML()}
+    </div>`;
+  }
+
+  const VISTE_HTML = {
+    gioco: vistaGioco,
+    laboratorio: () => `<div class="colonna"><section class="intro"><h2>Laboratorio</h2><p>In arrivo.</p></section></div>`,
+    indovina: () => `<div class="colonna"><section class="intro"><h2>Indovina la lente</h2><p>In arrivo.</p></section></div>`,
+    costruisci: () => `<div class="colonna"><section class="intro"><h2>Costruisci il caso</h2><p>In arrivo.</p></section></div>`,
+    personaggi: () => `<div class="colonna"><section class="intro"><h2>Personaggi</h2><p>In arrivo.</p></section></div>`,
+  };
+
+  function render() {
+    const focusKey = document.activeElement?.dataset?.testid;
+    main.classList.toggle("senza-semaforo", stato.vista !== "gioco");
+    main.innerHTML = VISTE_HTML[stato.vista]();
+    for (const a of $$("nav.modi a")) {
+      if (a.dataset.vista === stato.vista) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    }
+    if (focusKey) {
+      const el = $(`[data-testid="${focusKey}"]`);
+      if (el && !el.disabled) el.focus({ preventScroll: true });
+    }
+  }
+
+  const TEMI = ["auto", "light", "dark"];
+  const NOMI_TEMA = { auto: "Auto", light: "Chiaro", dark: "Scuro" };
+  function applicaTema(t) {
+    if (t === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.dataset.theme = t;
+    $("[data-tema-etichetta]").textContent = NOMI_TEMA[t];
+  }
+
+  function paramsDaSituazione(sit) {
+    const m = sit.modulatori, r = sit.richiesta;
+    return {
+      luogo: sit.luogo.id, condotta: sit.condotta.id, autore: sit.autore.id, osservatore: sit.osservatore.id, amici: sit.amici.map(a => a.id),
+      volume: m.volume, frequenza: m.frequenza, intento: m.intento, destinatario: m.destinatario, bambini: m.bambini,
+      rapporto: m.rapporto, religione: m.religione, pubblico: m.pubblico, stile: r.stile, forma: r.forma, motivazione: r.motivazione,
+    };
+  }
+
+  const AZIONI = {
+    nuova: () => nuova(),
+    avanti: () => avanti(),
+    rigioca: () => rigioca(),
+    condividi: () => condividi(),
+    "cambia-variabile": () => {
+      AZIONI_ESTERNE.prefill?.(paramsDaSituazione(stato.situazione));
+      location.hash = "#costruisci";
+    },
+    tema: () => {
+      const t = TEMI[(TEMI.indexOf(salvati.tema || "auto") + 1) % TEMI.length];
+      salva({ tema: t });
+      applicaTema(t);
+      toast(`Tema: ${NOMI_TEMA[t].toLowerCase()}`);
+    },
+    opzione: el => {
+      const d = el.dataset.domanda;
+      const tipo = el.closest("[data-tipo]").dataset.tipo;
+      stato.bozza[d] = tipo === "scala" ? +el.dataset.valore : el.dataset.valore;
+      for (const b of $$(`[data-azione=opzione][data-domanda="${d}"]`)) b.setAttribute("aria-checked", String(b === el));
+      const ds = M.domande(stato.livello, stato.situazione);
+      const btn = $("[data-testid=btn-vota]");
+      if (btn) btn.disabled = !ds.every(x => stato.bozza[x.id] !== undefined);
+    },
+    vota: () => {
+      const perche = $("[data-testid=voto-perche]")?.value || "";
+      vota({ ...stato.bozza, perche });
+      $("[data-testid=btn-avanti]")?.focus();
+    },
+  };
+  const AZIONI_ESTERNE = {};
+
+  document.addEventListener("click", e => {
+    const el = e.target.closest("[data-azione]");
+    if (!el || el.disabled || el.getAttribute("aria-disabled") === "true") return;
+    const fn = AZIONI[el.dataset.azione];
+    if (fn) { e.preventDefault(); fn(el); }
+  });
+  document.addEventListener("input", e => {
+    if (e.target.matches("[data-testid=voto-perche]")) {
+      const c = $("[data-contatore]");
+      if (c) c.textContent = `${e.target.value.length}/140`;
+    }
+  });
+  document.addEventListener("keydown", e => {
+    const el = e.target.closest?.("[role=radio]");
+    if (!el || !["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) return;
+    const gruppo = $$("[role=radio]", el.closest("[role=radiogroup]"));
+    const i = gruppo.indexOf(el) + (["ArrowRight", "ArrowDown"].includes(e.key) ? 1 : -1);
+    const next = gruppo[(i + gruppo.length) % gruppo.length];
+    if (next && !next.disabled) { e.preventDefault(); next.focus(); next.click(); }
+  });
+
+  addEventListener("hashchange", router);
+  applicaTema(salvati.tema || "auto");
+  router();
+
+  window.__CHR__ = {
+    version: "1.0.0",
+    stato: () => clona({ seed: stato.seed, situazione: stato.situazione, livello: stato.livello, storico: storico(), voti: stato.voti, finito: stato.finito, vista: stato.vista }),
+    nuova,
+    avanti,
+    vota,
+    generaSituazione: seed => M.generaSituazione(seed, opz()),
+    simulaPercorso: seed => M.simulaPercorso(seed, opz()),
+    testiPercorso: seed => M.testiPercorso(seed, opz()),
+    lenti: (livello, domanda) => (stato.situazione ? lentiPer(livello, domanda).map(({ id, valore }) => ({ id, valore })) : []),
+    get dati() {
+      return { PERSONAGGI: personaggi, LUOGHI: M.LUOGHI, CONDOTTE: M.CONDOTTE, MODULATORI: M.MODULATORI, RICHIESTE: { STILI: M.STILI, FORME: M.FORME, MOTIVAZIONI: M.MOTIVAZIONI, CONCRETE: M.CONCRETE }, TEMPLATE: M.TEMPLATE };
+    },
+    storageKey: STORAGE_KEY,
+    resetStorage() {
+      storage.reset();
+      salvati = {};
+      personaggi = predefiniti();
+      applicaTema("auto");
+      render();
+    },
+    _interno: { stato, AZIONI, AZIONI_ESTERNE, VISTE_HTML, render, salva, storage, get personaggi() { return personaggi; }, set personaggi(v) { personaggi = v; }, salvaPersonaggi, toast, scenaHTML, avviaCostruita, paramsDaSituazione, pgPerId, opz },
+  };
+})();
 </script>
 </body>
 </html>
