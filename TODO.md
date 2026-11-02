@@ -41,12 +41,13 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] `window.__CHR__` completo → la suite di accettazione smette di saltarsi.
 - [x] E2E: partita completa, finale, rigioca, condividi, identità.
 
-## Fetta 3 — Grafica completa (spec §8, STYLE §5-7)
+## Fetta 3 — Grafica completa (spec §8, STYLE §5-7) ✅
 
-- [ ] 11 fondali con dettaglio comico.
-- [ ] 12 distintivi, 3 corporature, 5 tagli, 6 espressioni, 4 pose.
+- [x] 11 fondali con dettaglio comico.
+- [x] 12 distintivi, 3 corporature, 5 tagli, 6 espressioni, 4 pose.
 - [x] Strumento galleria screenshot (`npm run galleria`) per la revisione visiva.
-- [ ] Revisione visiva desktop, mobile, tema scuro.
+- [x] Revisione visiva desktop, mobile, tema scuro.
+- [x] Test unitari degli asset: SVG valido per ogni personaggio × espressione × posa e per 400 scene.
 
 ## Fetta 4 — Editor personaggi (AC 8)
 

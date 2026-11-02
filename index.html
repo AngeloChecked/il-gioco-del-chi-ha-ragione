@@ -1310,8 +1310,9 @@ globalThis.Asset = (() => {
     const W = [44, 56, 70][av.corpo] ?? 56;
     const s = `stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
     const scuro = scurisci(av.colore);
-    const gambe = posa === "seduto"
-      ? `<rect x="42" y="136" width="44" height="15" rx="6" fill="#3A3F47" ${s}/><rect x="72" y="140" width="14" height="50" rx="5" fill="#3A3F47" ${s}/><rect x="56" y="140" width="13" height="50" rx="5" fill="#3A3F47" ${s}/><ellipse cx="80" cy="192" rx="10" ry="5" fill="${INK}"/><ellipse cx="63" cy="192" rx="10" ry="5" fill="${INK}"/>`
+    const seduto = posa === "seduto";
+    const gambe = seduto
+      ? `<rect x="42" y="150" width="36" height="16" rx="6" fill="#3A3F47" ${s}/><rect x="44" y="160" width="14" height="32" rx="5" fill="#3A3F47" ${s}/><rect x="62" y="160" width="14" height="32" rx="5" fill="#3A3F47" ${s}/><ellipse cx="50" cy="193" rx="10" ry="5" fill="${INK}"/><ellipse cx="70" cy="193" rx="10" ry="5" fill="${INK}"/>`
       : `<rect x="45" y="138" width="14" height="54" rx="5" fill="#3A3F47" ${s}/><rect x="61" y="138" width="14" height="54" rx="5" fill="#3A3F47" ${s}/><ellipse cx="50" cy="193" rx="10" ry="5" fill="${INK}"/><ellipse cx="70" cy="193" rx="10" ry="5" fill="${INK}"/>`;
     const braccia = `<rect x="${60 - W / 2 - 11}" y="90" width="13" height="50" rx="6" fill="${scuro}" ${s}/><rect x="${60 + W / 2 - 2}" y="90" width="13" height="50" rx="6" fill="${scuro}" ${s}/><circle cx="${60 - W / 2 - 4.5}" cy="142" r="6" fill="${av.pelle}" ${s}/><circle cx="${60 + W / 2 + 4.5}" cy="142" r="6" fill="${av.pelle}" ${s}/>`;
     const busto = `<rect x="${60 - W / 2}" y="84" width="${W}" height="66" rx="16" fill="${av.colore}" ${s}/>`;
@@ -1319,10 +1320,11 @@ globalThis.Asset = (() => {
     const testa = `<circle cx="60" cy="52" r="28" fill="${av.pelle}" ${s}/>`;
     const orecchie = `<circle cx="32" cy="56" r="5" fill="${av.pelle}" ${s}/><circle cx="88" cy="56" r="5" fill="${av.pelle}" ${s}/>`;
     let corpo;
+    const su = seduto ? `<g transform="translate(0 18)">` : "<g>";
     if (retro) {
-      corpo = gambe + braccia + busto + collo + orecchie + testa + capelli(av, true) + distintivoTesta(av, true);
+      corpo = gambe + su + braccia + busto + collo + orecchie + testa + capelli(av, true) + distintivoTesta(av, true) + "</g>";
     } else {
-      corpo = distintivoSotto(av, o.mini) + gambe + braccia + busto + distintivoCorpo(av, W) + collo + orecchie + testa + capelli(av, false) + distintivoTesta(av, false) + faccia(espr, dir) + distintivoViso(av, dir);
+      corpo = distintivoSotto(av, o.mini) + gambe + su + braccia + busto + distintivoCorpo(av, W) + collo + orecchie + testa + capelli(av, false) + distintivoTesta(av, false) + faccia(espr, dir) + distintivoViso(av, dir) + "</g>";
     }
     const movimento = posa === "allontana" ? `<g stroke="${INK}" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M2 100 H18"/><path d="M-4 120 H14"/><path d="M4 140 H20"/></g>` : "";
     const ombra = o.mini ? "" : `<ellipse cx="60" cy="196" rx="34" ry="5" fill="#000" opacity=".15"/>`;
@@ -1339,20 +1341,21 @@ globalThis.Asset = (() => {
     return `<svg viewBox="22 0 76 76" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${avatar(p, { mini: true })}</svg>`;
   }
 
+  const sedia = (x, schienale, seduta, gambe = true) => `<g stroke="${INK}" stroke-width="3" stroke-linejoin="round"><rect x="${x - 40}" y="236" width="80" height="100" rx="12" fill="${schienale}"/><rect x="${x - 46}" y="326" width="92" height="16" rx="6" fill="${seduta}"/>${gambe ? `<path d="M${x - 36} 342 V378 M${x + 36} 342 V378" stroke-width="5"/>` : ""}</g>`;
   const SEDILE = {
-    parco: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 50}" y="296" width="100" height="10" rx="3" fill="#A0703F"/><rect x="${x - 50}" y="276" width="100" height="10" rx="3" fill="#A0703F"/><rect x="${x - 52}" y="328" width="104" height="10" rx="3" fill="#B98250"/><path d="M${x - 44} 338 V376 M${x + 44} 338 V376" stroke-width="5"/></g>`,
-    treno: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 44}" y="240" width="30" height="100" rx="10" fill="#3D6E9E"/><rect x="${x - 44}" y="326" width="90" height="16" rx="6" fill="#4F82B4"/></g>`,
-    ristorante: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 42}" y="250" width="10" height="90" fill="#7A4E2D"/><rect x="${x - 42}" y="328" width="80" height="12" rx="3" fill="#9A6A3F"/><path d="M${x - 34} 340 V378 M${x + 30} 340 V378" stroke-width="5"/></g>`,
-    cinema: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 46}" y="238" width="92" height="104" rx="14" fill="#9E2B2B"/><rect x="${x - 46}" y="324" width="92" height="20" rx="6" fill="#B83A3A"/></g>`,
-    biblioteca: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 42}" y="256" width="10" height="84" fill="#6B4A2B"/><rect x="${x - 42}" y="328" width="80" height="12" rx="3" fill="#8A6239"/><path d="M${x - 34} 340 V378 M${x + 30} 340 V378" stroke-width="5"/></g>`,
-    live: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 40}" y="246" width="80" height="94" rx="18" fill="#5B4A8C"/><rect x="${x - 44}" y="326" width="88" height="16" rx="6" fill="#6E5BA6"/><path d="M${x} 342 V372 M${x - 26} 380 H${x + 26}" stroke-width="5"/></g>`,
+    parco: x => `<g stroke="${INK}" stroke-width="3"><rect x="${x - 54}" y="262" width="108" height="12" rx="3" fill="#A0703F"/><rect x="${x - 54}" y="284" width="108" height="12" rx="3" fill="#A0703F"/><rect x="${x - 56}" y="326" width="112" height="12" rx="3" fill="#B98250"/><path d="M${x - 48} 338 V378 M${x + 48} 338 V378 M${x - 48} 262 V326 M${x + 48} 262 V326" stroke-width="5"/></g>`,
+    treno: x => sedia(x, "#3D6E9E", "#4F82B4", false),
+    ristorante: x => sedia(x, "#7A4E2D", "#9A6A3F"),
+    cinema: x => sedia(x, "#9E2B2B", "#B83A3A", false),
+    biblioteca: x => sedia(x, "#6B4A2B", "#8A6239"),
+    live: x => sedia(x, "#5B4A8C", "#6E5BA6"),
   };
 
   const FONDALE = {
     parco: () => `<rect width="800" height="400" fill="#DCEAE2"/><rect y="292" width="800" height="108" fill="#BCD6A6"/>
       <g stroke="${INK}" stroke-width="2"><rect x="636" y="150" width="22" height="150" fill="#8A6239"/><circle cx="650" cy="130" r="62" fill="#8DB87A"/><circle cx="604" cy="160" r="36" fill="#9CC489"/><circle cx="700" cy="160" r="38" fill="#9CC489"/>
       <rect x="64" y="110" width="8" height="190" fill="#6B6F76"/><rect x="52" y="96" width="32" height="20" rx="4" fill="#F4E6A1"/></g>
-      <g transform="translate(748 318)" stroke="${INK}" stroke-width="2"><ellipse cx="0" cy="10" rx="16" ry="11" fill="#9AA0A8"/><circle cx="12" cy="-4" r="8" fill="#A8AEB5"/><path d="M19 -4 L26 -2 L19 0 Z" fill="#E0A030"/><path d="M8 -8 L15 -6" stroke-width="2.5"/><circle cx="13" cy="-4" r="1.8" fill="${INK}"/></g>`,
+      <g transform="translate(590 322)" stroke="${INK}" stroke-width="2"><ellipse cx="0" cy="10" rx="16" ry="11" fill="#9AA0A8"/><circle cx="12" cy="-4" r="8" fill="#A8AEB5"/><path d="M19 -4 L26 -2 L19 0 Z" fill="#E0A030"/><path d="M8 -8 L15 -6" stroke-width="2.5"/><circle cx="13" cy="-4" r="1.8" fill="${INK}"/></g>`,
     piazza: () => `<rect width="800" height="400" fill="#E7E3D9"/><rect y="300" width="800" height="100" fill="#D3CBBC"/>
       <g stroke="${INK}" stroke-width="2"><rect x="0" y="80" width="170" height="220" fill="#E8C9A8"/><rect x="640" y="60" width="160" height="240" fill="#D9B48F"/>
       ${[20, 70, 120].map(x => `<rect x="${x}" y="110" width="30" height="44" fill="#BCD3E6"/><rect x="${x}" y="190" width="30" height="44" fill="#BCD3E6"/>`).join("")}
@@ -1368,8 +1371,8 @@ globalThis.Asset = (() => {
     treno: () => `<rect width="800" height="400" fill="#E9E5DB"/><rect y="320" width="800" height="80" fill="#8E949B"/>
       <g stroke="${INK}" stroke-width="2"><rect x="0" y="52" width="800" height="12" fill="#B8BDC3"/>
       ${[60, 320, 580].map(x => `<rect x="${x}" y="90" width="170" height="110" rx="16" fill="#BFD8E8"/><path d="M${x} ${170} q40 -30 80 -10 q50 20 90 -14 V200 H${x} Z" fill="#A6C79A" stroke="none"/>`).join("")}
-      <rect x="350" y="16" width="100" height="26" rx="3" fill="#222"/></g>
-      <text x="400" y="34" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="12" fill="#F5CD4E">Ritardo: 40'</text>`,
+      <rect x="640" y="16" width="100" height="26" rx="3" fill="#222"/></g>
+      <text x="690" y="34" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="12" fill="#F5CD4E">Ritardo: 40'</text>`,
     ristorante: () => `<rect width="800" height="400" fill="#F1E5D8"/><rect y="230" width="800" height="100" fill="#D8C2A8"/><rect y="320" width="800" height="80" fill="#B99C7E"/>
       <g stroke="${INK}" stroke-width="2"><path d="M400 0 V60" /><path d="M370 60 H430 L416 84 H384 Z" fill="#E0A030"/>
       <rect x="610" y="250" width="150" height="16" fill="#fff"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${610 + i * 30}" y="250" width="15" height="16" fill="#C8322B" stroke="none"/>`).join("")}<path d="M620 266 V330 M750 266 V330" stroke-width="5"/>
@@ -1391,9 +1394,9 @@ globalThis.Asset = (() => {
     cinema: () => `<rect width="800" height="400" fill="#4A4E57"/><rect y="330" width="800" height="70" fill="#3A3D44"/>
       <g stroke="${INK}" stroke-width="2"><rect x="120" y="24" width="560" height="150" fill="#F4F2EA"/>
       ${[40, 140, 240, 340, 440, 540, 640, 740].map(x => `<rect x="${x - 40}" y="200" width="80" height="60" rx="12" fill="#7E2626" opacity=".7"/>`).join("")}
-      <rect x="20" y="40" width="64" height="26" rx="3" fill="#3F8F5B"/></g>
+      <rect x="716" y="40" width="64" height="26" rx="3" fill="#3F8F5B"/></g>
       <text x="400" y="114" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="46" fill="${INK}">SSSHHH</text>
-      <text x="52" y="58" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="11" fill="#fff">USCITA</text>`,
+      <text x="748" y="58" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" font-size="11" fill="#fff">USCITA</text>`,
     biblioteca: () => `<rect width="800" height="400" fill="#ECE5D5"/><rect y="320" width="800" height="80" fill="#B89E7C"/>
       <g stroke="${INK}" stroke-width="2"><rect x="20" y="40" width="210" height="260" fill="#8A6239"/><rect x="570" y="40" width="210" height="260" fill="#8A6239"/>
       ${[60, 120, 180, 240].flatMap(y => [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<rect x="${30 + i * 22}" y="${y - 10}" width="16" height="48" fill="${["#C8322B", "#1F4E9C", "#3F8F5B", "#E0A030", "#7A5C99"][(i + y / 60) % 5]}"/><rect x="${580 + i * 22}" y="${y - 10}" width="16" height="48" fill="${["#3F8F5B", "#E0A030", "#C8322B", "#7A5C99", "#1F4E9C"][(i + y / 60) % 5]}"/>`)).join("")}
@@ -1423,8 +1426,8 @@ globalThis.Asset = (() => {
     const out = [];
     for (let i = 0; i < n; i++) {
       const x = 40 + ((i * 97) % 720);
-      const y = 248 + (i % 3) * 8;
-      out.push(`<g opacity="${viva ? 0.9 : 0.55}" fill="#B8BCC2" stroke="#8E949B" stroke-width="2"><circle cx="${x}" cy="${y}" r="14"/><rect x="${x - 20}" y="${y + 14}" width="40" height="50" rx="14"/></g>`);
+      const y = 226 + (i % 3) * 6;
+      out.push(`<g opacity="${viva ? 0.85 : 0.4}" fill="#B8BCC2" stroke="#8E949B" stroke-width="2"><circle cx="${x}" cy="${y}" r="11"/><rect x="${x - 15}" y="${y + 11}" width="30" height="38" rx="11"/></g>`);
     }
     return out.join("");
   }
@@ -1480,7 +1483,7 @@ globalThis.Asset = (() => {
       const espr = passo.espressioni?.[p.id] || "calmo";
       const dir = x < 410 ? 1 : -1;
       const s = ruolo === "amico" ? 0.9 : 1;
-      const ty = 380 - 200 * s + (posa === "seduto" ? -6 : 0);
+      const ty = 380 - 200 * s;
       const nome = tag ? `${tag} · ${p.nome}` : p.nome;
       parti.push(`<g data-testid="personaggio" data-id="${esc(p.id)}" data-ruolo="${ruolo}" data-espressione="${espr}" data-posa="${posa}" role="img" aria-label="${esc((tag ? tag + ", " : "") + descrizioneAvatar(p, espr, posa))}">
         <g transform="translate(${x - 60 * s} ${ty}) scale(${s})" ${posa === "allontana" ? 'opacity=".85"' : ""}>${avatar(p, { espressione: espr, posa, dir })}</g>

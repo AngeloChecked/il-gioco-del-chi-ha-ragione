@@ -20,3 +20,10 @@ export function caricaMotore() {
   if (!ctx.Motore) throw new Error("lo script #motore non definisce globalThis.Motore");
   return ctx.Motore;
 }
+
+export function caricaAsset() {
+  const ctx = vm.createContext({});
+  vm.runInContext(scriptInline("motore"), ctx, { filename: "index.html#motore" });
+  vm.runInContext(scriptInline("asset"), ctx, { filename: "index.html#asset" });
+  return { Motore: ctx.Motore, Asset: ctx.Asset };
+}
