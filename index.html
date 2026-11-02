@@ -20,13 +20,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#B4B8BE; --linea:#555A62;
-    --blu:#7FA6F2; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#6FC28B; --rosso-testo:#F07A73;
+    --blu:#7FA6F2; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#6FC28B; --rosso-testo:#FF9B94;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#B4B8BE; --linea:#555A62;
-  --blu:#7FA6F2; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#6FC28B; --rosso-testo:#F07A73;
+  --blu:#7FA6F2; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#6FC28B; --rosso-testo:#FF9B94;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -214,6 +214,7 @@ table.confronto td.uguale { color: var(--verde-testo); font-weight: 700; }
   .fumetto::after { display: none; }
   .fumetto { font-size: 16px; }
   .chip .nome { display: none; }
+  .barre li { grid-template-columns: minmax(0, 1fr) 64px 40px; font-size: 14px; }
   .scheda { padding: 16px; }
   .opzioni { grid-template-columns: repeat(min(var(--n), 3), minmax(0, 1fr)); }
   .opzioni[data-tipo="scala"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -496,7 +497,7 @@ globalThis.Motore = (() => {
         battuta: ["Mmh, questo panino con la cipolla è una poesia.", "Scusate, ho una fame che non vi dico.", "Ne volete? No? Meglio."],
       },
       odore: {
-        narra: ["{autore} è appena uscito da una lunga giornata. Molto lunga. E si sente.", "{autore} arriva dalla palestra, senza passare dalla doccia.", "Intorno a {autore} si forma un cerchio di aria piuttosto intensa."],
+        narra: ["{autore} arriva da una lunga giornata. Molto lunga. E si sente.", "{autore} arriva dalla palestra, senza passare dalla doccia.", "Intorno a {autore} si forma un cerchio di aria piuttosto intensa."],
         battuta: ["Che giornata, ragazzi. Sono a pezzi.", "Dieci chilometri a piedi oggi, record personale!", "Fa caldissimo, vero?"],
       },
       lingua_madre: {
@@ -544,13 +545,13 @@ globalThis.Motore = (() => {
       reazione_amici: ["Oh-oh.", "Ecco, lo sapevo.", "Qualcuno ha dei popcorn?"],
     },
     risposta: {
-      accetta: ["Hai ragione, scusa, non ci avevo fatto caso.", "Ops, scusa. Non me ne ero accorto.", "Ok, nessun problema. Scusami."],
+      accetta: ["Hai ragione, scusa, non ci avevo fatto caso.", "Ops, scusa. Mi è proprio sfuggita.", "Ok, nessun problema. Scusami."],
       accetta_a_meta: ["Ok, abbasso la voce, ma non stavo parlando con te.", "Va bene, mi modero. Un pochino.", "Faccio piano, ma il problema ce l'hai tu, eh."],
       rifiuta_gentile: ["Capisco, ma sto parlando con i miei amici, non ti sto disturbando apposta.", "Mi dispiace, ma non credo di fare niente di male.", "Rispetto il tuo punto di vista, ma continuo come prima."],
-      rifiuta_sgarbato: ["Fatti i fatti tuoi, non sto parlando con te.", "E tu chi saresti, il vigile del galateo?", "Se non ti piace, c'è tanto spazio intorno."],
-      accetta_identita: ["Ok... va bene, la smetto.", "Va bene. Scusa se esisto.", "D'accordo, ci starò attento. Che tristezza, però."],
-      rifiuta_gentile_identita: ["Sto solo essendo me stesso. Non c'è niente da smettere.", "Capisco che ti stupisca, ma è la mia vita, non uno spettacolo.", "Non ti sto facendo niente: esisto e basta."],
-      rifiuta_sgarbato_identita: ["Davvero mi stai chiedendo di essere diverso? Ma per favore.", "Il problema qui non sono io, fidati.", "Ah sì? E poi cosa, mi chiedi di trasferirmi su Marte?"],
+      rifiuta_sgarbato: ["Fatti i fatti tuoi, non sto parlando con te.", "E tu chi saresti, la polizia del galateo?", "Se non ti piace, c'è tanto spazio intorno."],
+      accetta_identita: ["Ok... va bene, la smetto.", "Va bene. Scusa se esisto.", "D'accordo, ci farò attenzione. Che tristezza, però."],
+      rifiuta_gentile_identita: ["Sto solo vivendo la mia vita. Non c'è niente da smettere.", "Capisco che ti stupisca, ma è la mia vita, non uno spettacolo.", "Non ti sto facendo niente: esisto e basta."],
+      rifiuta_sgarbato_identita: ["Davvero mi stai chiedendo di essere un'altra persona? Ma per favore.", "Il problema qui non sono io, fidati.", "Ah sì? E poi cosa, mi chiedi di trasferirmi su Marte?"],
       ringrazia: ["Grazie, davvero.", "Grazie, apprezzo.", "Grazie mille, sul serio."],
       chiusura_pace: ["E la pace tornò a regnare. Per ora.", "Crisi diplomatica evitata. Il piccione è deluso.", "Tutto risolto in dieci secondi. Un record."],
     },
@@ -586,7 +587,7 @@ globalThis.Motore = (() => {
         narra: ["La battuta funziona. Qualcuno ride e la tensione scende.", "Risata generale. Anche i più arrabbiati si sciolgono un po'.", "Un sorriso scappa a tutti. Fine delle ostilità."],
       },
       insulti: {
-        autore: ["Ma chi ti credi di essere?!", "Ma senti questo [insulto]!", "Vai a fare la morale altrove!"],
+        autore: ["Ma chi ti credi di essere?!", "Ma pensa te, che [insulto]!", "Vai a fare la morale altrove!"],
         osservatore: ["Maleducazione allo stato puro!", "Ma guarda che [insulto]!", "Non ho mai visto una cosa del genere!"],
         narra: ["I toni salgono. Tutti intorno fanno finta di guardare il telefono.", "Volano parole grosse. Il piccione si allontana per prudenza.", "La discussione diventa un duello di urla."],
       },
@@ -628,7 +629,7 @@ globalThis.Motore = (() => {
     },
     sara: {
       chiedere: ["Scusa, potresti {cosa}? Il problema è il volume, non le parole.", "Scusa, potresti {cosa}? Non ce l'ho con te, è uno spazio comune."],
-      rifiutare: ["Mi dispiace, ma stavo parlando con lui, non con te.", "Il rispetto lo devo a chi parla con me, non a chi ascolta per caso.", "Interessante. Ma non stavo parlando con te."],
+      rifiutare: ["Mi dispiace, ma stavo parlando con chi è con me, non con te.", "Il rispetto lo devo a chi parla con me, non a chi ascolta per caso.", "Interessante. Ma non stavo parlando con te."],
       accettare: ["Ok, mi modero. Non sapevo ti pesasse."],
     },
     ettore: {
@@ -1640,7 +1641,9 @@ globalThis.Asset = (() => {
       const prev = tot[s.id] || { d: 0, n: 0 };
       tot[s.id] = { d: +(prev.d + s.distanza).toFixed(3), n: prev.n + 1 };
     }
-    salva({ somiglianza: tot, partite: (salvati.partite || 0) + 1 });
+    const voce = { seed: stato.costruita ? null : stato.seed, quando: new Date().toISOString(), luogo: stato.situazione.luogo.id, condotta: stato.situazione.condotta.id, esito: stato.percorso.at(-1).esito, etichetta: M.etichettaCaso(stato.voti, stato.situazione, stato.percorso, personaggi), voti: stato.voti };
+    const storicoPartite = [voce, ...(Array.isArray(salvati.storico) ? salvati.storico : [])].slice(0, 50);
+    salva({ somiglianza: tot, partite: (salvati.partite || 0) + 1, storico: storicoPartite });
   }
 
   let annunciTimer;
@@ -1865,7 +1868,7 @@ globalThis.Asset = (() => {
       ${tutteDomande.length ? `<div>
         <h3>I tuoi voti e le lenti</h3>
         <p class="nota">A = ${esc(sit.autore.nome)} · B = ${esc(sit.osservatore.nome)}. In verde i voti uguali al tuo.</p>
-        <div class="tabella-wrap"><table class="confronto" data-testid="finale-confronto">
+        <div class="tabella-wrap" tabindex="0" role="region" aria-label="Tabella dei voti a confronto"><table class="confronto" data-testid="finale-confronto">
           <thead><tr><th scope="col">Domanda</th><th scope="col">Tu</th>${M.principali(personaggi).map(p => `<th scope="col">${esc(p.nome)}</th>`).join("")}</tr></thead>
           <tbody>${tutteDomande.map(d => {
             const tuo = stato.voti.find(v => v.domanda === d.id);
@@ -2134,6 +2137,7 @@ globalThis.Asset = (() => {
         ${[1, 2, 3, 4, 5].map(y => `<line x1="${ml}" x2="${W - mr}" y1="${Y(y)}" y2="${Y(y)}" stroke="currentColor" stroke-opacity=".15"/><text x="${ml - 10}" y="${Y(y) + 5}" text-anchor="end" font-size="13">${y}</text>`).join("")}
         ${xs.map(([, et], i) => `<text transform="translate(${X(i)} ${H - mb + 18}) rotate(${xs.length > 4 ? -35 : 0})" text-anchor="${xs.length > 4 ? "end" : "middle"}" font-size="12">${esc(et.length > 18 ? et.slice(0, 17) + "…" : et)}</text>`).join("")}
         ${linee.map(({ p, punti }, k) => `<polyline points="${punti.map(([x, y]) => `${x},${y + off(k, linee.length)}`).join(" ")}" fill="none" stroke="${esc(p.avatar?.colore || "#888")}" stroke-width="2.5" stroke-opacity=".85" stroke-dasharray="${k % 2 ? "6 4" : "none"}"/>`).join("")}
+        ${linee.map(({ p, punti }, k) => punti.map(([x, y]) => `<circle cx="${x}" cy="${y + off(k, linee.length)}" r="3.5" fill="${esc(p.avatar?.colore || "#888")}"/>`).join("")).join("")}
         ${miei.length > 1 ? `<polyline points="${miei.map(([i, y]) => `${X(i)},${Y(y)}`).join(" ")}" fill="none" stroke="currentColor" stroke-width="4"/>` : ""}
         ${miei.map(([i, y]) => `<circle cx="${X(i)}" cy="${Y(y)}" r="7" fill="var(--giallo)" stroke="currentColor" stroke-width="3"/>`).join("")}
       </svg>
@@ -2378,7 +2382,13 @@ globalThis.Asset = (() => {
   });
 
   Object.assign(AZIONI, {
-    "seleziona-pg": el => { editor.sel = el.dataset.id; render(); $(`[data-testid=editor-personaggio][data-id="${CSS.escape(el.dataset.id)}"]`)?.focus(); },
+    "seleziona-pg": el => {
+      editor.sel = el.dataset.id;
+      render();
+      const card = $(`[data-testid=editor-personaggio][data-id="${CSS.escape(el.dataset.id)}"]`);
+      card?.focus({ preventScroll: true });
+      if (matchMedia("(max-width: 900px)").matches) $("[data-testid=editor]")?.scrollIntoView({ block: "start" });
+    },
     "pg-duplica": () => {
       const p = pgSelezionato();
       const copia = { ...clona(p), id: idUnico(p.id), nome: `${p.nome} (copia)`.slice(0, 30), principale: false, ruolo: undefined };

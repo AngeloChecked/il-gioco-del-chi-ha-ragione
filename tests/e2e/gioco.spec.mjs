@@ -84,6 +84,10 @@ test("partita completa fino alla sentenza (AC2-AC5)", async ({ page }) => {
   await expect(page.getByTestId("finale-somiglianza")).toContainText(/somigli a/);
   await expect(page.getByTestId("finale-confronto").locator("tbody tr")).toHaveCount(10);
   expect(await chr(page, () => __CHR__.stato().finito)).toBe(true);
+  const salvato = await page.evaluate(k => JSON.parse(localStorage.getItem(k)), await chr(page, () => __CHR__.storageKey));
+  expect(salvato.partite).toBe(1);
+  expect(salvato.storico[0]).toMatchObject({ seed });
+  expect(salvato.storico[0].voti).toHaveLength(10);
 });
 
 test("chiusura anticipata: chi cede accende il verde e chiude", async ({ page }) => {

@@ -5,10 +5,11 @@ Il gioco (`index.html`) deve esporre questo contratto, così la suite `tests/sui
 ## 0. Struttura di `index.html`
 
 - `<script id="motore">`: logica pura (RNG, dati, generatore, formule, escalation, testi). Definisce `globalThis.Motore`. **Non tocca DOM, `window`, `localStorage`**: i test unitari lo eseguono in `node:vm` senza browser e falliscono se lo fa.
-- `<script id="app">`: rendering, eventi, stato, storage, router. Usa `Motore` ed espone `window.__CHR__`.
+- `<script id="asset">`: funzioni pure che restituiscono SVG (avatar, fondali, scena, icone). Definisce `globalThis.Asset`. Testato in `node:vm` (`tests/unit/asset.test.mjs`).
+- `<script id="app">`: rendering, eventi, stato, storage, router. Usa `Motore` e `Asset` ed espone `window.__CHR__`. `__CHR__._interno` serve solo ai test e agli strumenti, non fa parte del contratto.
 
 Test:
-- `tests/unit/*.test.mjs` → `npm test`, solo `Motore`.
+- `tests/unit/*.test.mjs` → `npm test`, `Motore` e `Asset`.
 - `tests/e2e/*.spec.mjs` → `npm run e2e`, pagina vera su Firefox, Chromium, WebKit mobile, più axe in tema chiaro e scuro.
 - `tests/e2e/accettazione.spec.mjs` esegue `tests/suite.js` e si salta da solo finché `__CHR__` non è completo.
 
@@ -67,6 +68,19 @@ Requisiti:
 | `editor-tratto` | Cursore tratto (attributo `data-tratto`) |
 | `editor-esaspera` | Cursore esaspera |
 | `editor-duplica` · `editor-nuovo` · `editor-ripristina` | Pulsanti editor |
+| `intro` · `btn-intro-nuova` | Schermata iniziale senza partita |
+| `livello-nome` | Titolo del livello corrente sopra la scena |
+| `voto-confermato` | Frase "la pensi come…" dopo il voto |
+| `finale-confronto` | Tabella tuoi voti vs lenti |
+| `btn-finale-nuova` · `btn-rigioca` · `btn-cambia-variabile` · `btn-condividi` | Pulsanti della schermata finale |
+| `annunci` | Regione `aria-live` con i fumetti del passo |
+| `toast` | Messaggi brevi (link copiato, ecc.) |
+| `btn-tema` | Cambio tema auto/chiaro/scuro |
+| `nav-gioco` · `nav-laboratorio` · `nav-indovina` · `nav-costruisci` · `nav-personaggi` | Navigazione |
+| `lab-scena` · `lab-voto` · `lab-opzione` · `btn-lab-reset` | Laboratorio |
+| `costruisci-campo` · `costruisci-anteprima` · `costruisci-probabilita` · `costruisci-esiti` · `costruisci-errore` · `btn-costruisci-avvia` · `btn-costruisci-reset` | Costruisci il caso |
+| `indovina-scena` · `indovina-personaggio` · `indovina-opzione` · `indovina-esito` · `indovina-punteggio` · `btn-indovina-nuovo` | Indovina la lente |
+| `editor` · `editor-elenco` · `editor-nome` · `editor-lente` · `editor-anteprima` · `editor-esempio` · `editor-elimina` | Editor personaggi |
 
 ## 3. Domande attese per livello (spec §5)
 

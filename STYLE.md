@@ -94,13 +94,15 @@ Questo avviso è l'unico testo che **non** fa battute.
 | `--bg` | `#F7F7F2` | `#2E3136` | Sfondo pagina |
 | `--fg` | `#2E3136` | `#F7F7F2` | Testo principale |
 | `--surface` | `#FFFFFF` | `#3A3E44` | Card, pannelli voto, fumetti |
-| `--muted` | `#6B6F76` | `#A9ADB3` | Testo secondario |
-| `--blu` | `#1F4E9C` | `#5B8DEF` | Intestazioni, accenti, link |
+| `--muted` | `#5F636A` | `#B4B8BE` | Testo secondario |
+| `--blu` | `#1F4E9C` | `#7FA6F2` | Intestazioni, accenti, link (in scuro più chiaro per il contrasto AA dei link) |
 | `--blu-pulsante` | `#1F4E9C` | `#2F62C0` | Sfondo pulsanti primari con testo bianco (in scuro `#5B8DEF` col bianco non passa AA) |
 | `--giallo` | `#F2C230` | `#F5CD4E` | Livelli intermedi, evidenziazioni, focus |
 | `--rosso` | `#C8322B` | `#E5544C` | Livelli alti, urla |
 | `--verde` | `#3F8F5B` | `#5DB37A` | Qualcuno cede, esiti pacifici |
-| `--verde-testo` | `#2F6E45` | `#5DB37A` | Verde usato come testo (contrasto AA) |
+| `--verde-testo` | `#2F6E45` | `#6FC28B` | Verde usato come testo (contrasto AA) |
+| `--rosso-testo` | `#B02A24` | `#FF9B94` | Rosso usato come testo: avvisi, timbro (contrasto AA) |
+| `--linea` | `#D5D6D0` | `#555A62` | Bordi e separatori |
 
 ```css
 :root {

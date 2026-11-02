@@ -76,13 +76,21 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] Scena + personaggio, previsione, rivelazione, punteggio persistente.
 - [x] E2E.
 
-## Fetta 8 — Rifinitura
+## Fetta 8 — Rifinitura ✅
 
-- [ ] Accessibilità: tastiera, aria-live, reduced motion, contrasto in entrambi i temi (axe su tutte le viste).
-- [ ] Mobile 375px su tutte le viste.
-- [ ] Storage assente/corrotto.
-- [ ] Rilettura testi e tono (STYLE §2).
-- [ ] Documentazione aggiornata (TEST-API, CLAUDE.md, STYLE).
+- [x] Accessibilità: axe WCAG AA su 8 viste × 2 temi × 3 browser; tastiera (frecce nei gruppi di voto, focus dopo il voto), `aria-live` per i fumetti, espressioni descritte a parole, semaforo con numero ed etichetta, `prefers-reduced-motion`.
+- [x] Contrasto: `--blu` scuro `#7FA6F2`, `--blu-pulsante` per i pulsanti, `--rosso-testo` per avvisi e timbro.
+- [x] Mobile 375px su tutte le viste, nessuno scroll orizzontale (testato), fumetti sotto la scena nelle viste strette.
+- [x] Storage assente, bloccato o corrotto: si gioca con i predefiniti (testato).
+- [x] Storico delle ultime 50 partite con i voti in `localStorage`.
+- [x] Rilettura testi: forme neutre dove il personaggio può essere di qualsiasi genere.
+- [x] Documentazione aggiornata (TEST-API, CLAUDE.md, STYLE).
+- [x] Galleria con viste mobile e tema scuro; verifica finale via Playwright MCP su Firefox.
+
+## Stato finale
+
+- 56 test unitari (motore + asset), 176 e2e su Firefox, Chromium, WebKit mobile, suite di accettazione AC1-AC10 verde.
+- Criteri di accettazione spec §12: tutti soddisfatti.
 
 ## Backlog (spec §13, fuori scope)
 

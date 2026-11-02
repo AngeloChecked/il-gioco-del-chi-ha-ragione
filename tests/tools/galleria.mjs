@@ -77,11 +77,23 @@ try {
     await scatta(scuro, "50-scuro-livello-0", null);
   }
 
-  for (const vista of solo && !["avatar", "luoghi", "livelli"].includes(solo) ? [solo] : !solo ? ["laboratorio", "indovina", "costruisci", "personaggi"] : []) {
+  for (const vista of solo && !["avatar", "luoghi", "livelli", "viste"].includes(solo) ? [solo] : !solo ? ["laboratorio", "indovina", "costruisci", "personaggi"] : []) {
     await desktop.setViewportSize({ width: 1280, height: 1400 });
     await desktop.goto(`http://127.0.0.1:${PORT}/index.html#${vista}`);
     await desktop.waitForTimeout(150);
     await scatta(desktop, `60-${vista}`, null);
+  }
+
+  if (!solo || solo === "viste") {
+    for (const [nome, opzioni] of [["mobile", { viewport: { width: 375, height: 812 }, deviceScaleFactor: 2 }], ["scuro", { viewport: { width: 1280, height: 900 }, colorScheme: "dark" }]]) {
+      const pg = await browser.newPage({ ...opzioni, reducedMotion: "reduce" });
+      for (const vista of ["laboratorio", "indovina", "costruisci", "personaggi"]) {
+        await pg.goto(`http://127.0.0.1:${PORT}/index.html#${vista}`);
+        await pg.waitForTimeout(100);
+        await scatta(pg, `70-${nome}-${vista}`, null);
+      }
+      await pg.close();
+    }
   }
 
   await writeFile(join(out, "index.html"), `<!doctype html><meta charset="utf-8"><title>Galleria</title><body style="font-family:sans-serif;background:#eee">${scatti.map(f => `<figure><figcaption>${f}</figcaption><img src="${f}" style="max-width:100%;border:1px solid #999"></figure>`).join("")}`);
