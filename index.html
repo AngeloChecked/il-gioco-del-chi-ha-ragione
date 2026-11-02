@@ -1904,7 +1904,7 @@ globalThis.Asset = (() => {
     laboratorio: () => `<div class="colonna"><section class="intro"><h2>Laboratorio</h2><p>In arrivo.</p></section></div>`,
     indovina: () => `<div class="colonna"><section class="intro"><h2>Indovina la lente</h2><p>In arrivo.</p></section></div>`,
     costruisci: () => `<div class="colonna"><section class="intro"><h2>Costruisci il caso</h2><p>In arrivo.</p></section></div>`,
-    personaggi: () => `<div class="colonna"><section class="intro"><h2>Personaggi</h2><p>In arrivo.</p></section></div>`,
+    personaggi: () => vistaPersonaggi(),
   };
 
   function render() {
@@ -1970,6 +1970,146 @@ globalThis.Asset = (() => {
   };
   const AZIONI_ESTERNE = {};
 
+  const editor = { sel: null };
+  const PELLI = ["#F1D3B8", "#E0B48F", "#C08A63", "#8E5C3C", "#5E3B26"];
+  const CORPI = ["esile", "media", "robusta"];
+  const NOMI_DISTINTIVI = { maglione: "Maglione", giacca: "Giacca", cappello: "Cappello", occhiali: "Occhiali", giubbotto: "Giubbotto", foulard: "Foulard", kufi: "Kufi e barba", passeggino: "Passeggino", cuffie: "Cuffie", mascherina: "Mascherina", occhiali_sole: "Occhiali da sole", badge: "Badge e cravatta", nessuno: "Nessuno" };
+  const idPredefiniti = new Set(M.PERSONAGGI.map(p => p.id));
+  const pgSelezionato = () => pgPerId(editor.sel) || personaggi[0];
+
+  function idUnico(base) {
+    let n = 2, id = `${base}-${n}`;
+    while (pgPerId(id)) id = `${base}-${++n}`;
+    return id;
+  }
+
+  function votoEsempio(p) {
+    const sit = M.costruisciSituazione({}, opz());
+    return M.votoPrevisto(p, sit, "richiesta_ragionevole", []);
+  }
+
+  function anteprimaHTML(p) {
+    return ["calmo", "infastidito", "arrabbiato"].map(e => A.avatarSVG(p, { espressione: e })).join("");
+  }
+
+  function vistaPersonaggi() {
+    const p = pgSelezionato();
+    editor.sel = p.id;
+    const eliminabile = !idPredefiniti.has(p.id) && personaggi.filter(x => x.ruolo !== "terzo").length > 3;
+    const opzioni = (lista, valore) => lista.map(([v, et]) => `<option value="${esc(v)}"${String(v) === String(valore) ? " selected" : ""}>${esc(et)}</option>`).join("");
+    const av = { corpo: 1, distintivo: "nessuno", colore: "#888888", pelle: PELLI[1], capelli: "#3B2A20", taglio: "corti", ...p.avatar };
+    return `<div class="colonna">
+      <div class="intestazione-scena"><h2>Personaggi</h2><p class="nota">Archetipi di posizione, non caricature. Cambia i tratti e guarda come cambiano voti e lenti.</p></div>
+      <div class="griglia-2">
+        <section aria-labelledby="titolo-elenco">
+          <h3 id="titolo-elenco">Il cast</h3>
+          <div class="schede-pg" data-testid="editor-elenco">${personaggi.map(x => `<button type="button" class="scheda-pg" data-testid="editor-personaggio" data-id="${esc(x.id)}" data-azione="seleziona-pg" aria-pressed="${x.id === p.id}">${A.avatarSVG(x)}<b data-nome-di="${esc(x.id)}">${esc(x.nome)}</b><span class="titolo">${esc(x.titolo || "")}${x.principale ? " · lente" : ""}${x.ruolo === "terzo" ? " · arbitro" : ""}</span></button>`).join("")}</div>
+          <div class="pulsanti" style="margin-top:12px">
+            <button type="button" class="btn btn-sec" data-azione="pg-nuovo" data-testid="editor-nuovo">+ Nuovo personaggio</button>
+            <button type="button" class="btn btn-sec" data-azione="pg-ripristina" data-testid="editor-ripristina">Ripristina predefiniti</button>
+          </div>
+        </section>
+        <section class="scheda" data-testid="editor" aria-labelledby="titolo-editor" style="border-left-color:${esc(av.colore)}">
+          <h3 id="titolo-editor" data-nome-di="${esc(p.id)}">${esc(p.nome)}</h3>
+          <div class="anteprima" data-testid="editor-anteprima" aria-label="Anteprima di ${esc(p.nome)}">${anteprimaHTML(p)}</div>
+          <p class="nota" data-testid="editor-esempio" style="margin-top:8px">Nel caso base del laboratorio troverebbe la richiesta ragionevole: <b>${votoEsempio(p)}/5</b>.</p>
+          <div class="campi">
+            <div class="campo"><label for="ed-nome">Nome</label><input id="ed-nome" type="text" maxlength="30" data-editor="nome" data-testid="editor-nome" value="${esc(p.nome)}"></div>
+            <div class="campo"><label for="ed-titolo">Titolo</label><input id="ed-titolo" type="text" maxlength="40" data-editor="titolo" value="${esc(p.titolo || "")}"></div>
+            <div class="campo"><label for="ed-descr">Descrizione</label><textarea id="ed-descr" maxlength="400" data-editor="descrizione">${esc(p.descrizione || "")}</textarea></div>
+            <div class="campo"><label for="ed-lente">Lente (come giudica)</label><input id="ed-lente" type="text" maxlength="120" data-editor="lente" data-testid="editor-lente" value="${esc(p.lente || "")}"></div>
+            <h3 style="margin-top:8px">Tratti</h3>
+            ${M.TRATTI.map(k => `<div class="cursore"><label for="ed-${k}">${esc(M.NOMI_TRATTI[k])}</label><input id="ed-${k}" type="range" min="0" max="1" step="0.01" value="${p.tratti[k]}" data-tratto="${k}" data-testid="editor-tratto"><output for="ed-${k}" data-out="${k}">${(+p.tratti[k]).toFixed(2)}</output></div>`).join("")}
+            <div class="cursore"><label for="ed-esaspera">Esaspera (amplifica i tratti distintivi)</label><input id="ed-esaspera" type="range" min="0.5" max="1.5" step="0.05" value="${p.esasperazione ?? 1}" data-editor="esasperazione" data-testid="editor-esaspera"><output for="ed-esaspera" data-out="esasperazione">×${(+(p.esasperazione ?? 1)).toFixed(2)}</output></div>
+            <h3 style="margin-top:8px">Aspetto</h3>
+            <div class="campo"><label for="ed-corpo">Corporatura</label><select id="ed-corpo" data-avatar="corpo">${opzioni(CORPI.map((c, i) => [i, c]), av.corpo)}</select></div>
+            <div class="campo"><label for="ed-dist">Elemento distintivo</label><select id="ed-dist" data-avatar="distintivo">${opzioni(A.DISTINTIVI.map(d => [d, NOMI_DISTINTIVI[d]]), av.distintivo)}</select></div>
+            <div class="campo"><label for="ed-taglio">Capelli</label><select id="ed-taglio" data-avatar="taglio">${opzioni(A.TAGLI.map(t => [t, t]), av.taglio)}</select></div>
+            <div class="campo"><label for="ed-pelle">Carnagione</label><select id="ed-pelle" data-avatar="pelle">${opzioni(PELLI.map((c, i) => [c, `tono ${i + 1}`]), av.pelle)}</select></div>
+            <div class="campo"><label for="ed-colore">Colore vestito</label><input id="ed-colore" type="color" data-avatar="colore" value="${esc(av.colore)}"></div>
+            <div class="campo"><label for="ed-capelli">Colore capelli</label><input id="ed-capelli" type="color" data-avatar="capelli" value="${esc(av.capelli)}"></div>
+          </div>
+          <div class="pulsanti" style="margin-top:16px">
+            <button type="button" class="btn" data-azione="pg-duplica" data-testid="editor-duplica">Duplica</button>
+            ${eliminabile ? `<button type="button" class="btn btn-sec" data-azione="pg-elimina" data-testid="editor-elimina">Elimina</button>` : ""}
+          </div>
+        </section>
+      </div>
+    </div>`;
+  }
+
+  function aggiornaEditorInPlace(p) {
+    const ant = $("[data-testid=editor-anteprima]");
+    if (ant) ant.innerHTML = anteprimaHTML(p);
+    const card = $(`[data-testid=editor-personaggio][data-id="${CSS.escape(p.id)}"] svg`);
+    if (card) card.outerHTML = A.avatarSVG(p);
+    for (const el of $$(`[data-nome-di="${CSS.escape(p.id)}"]`)) el.textContent = p.nome;
+    const es = $("[data-testid=editor-esempio] b");
+    if (es) es.textContent = `${votoEsempio(p)}/5`;
+  }
+
+  function inputEditor(el) {
+    const p = pgSelezionato();
+    if (el.dataset.tratto) {
+      p.tratti[el.dataset.tratto] = Math.min(1, Math.max(0, parseFloat(el.value) || 0));
+      $(`[data-out="${el.dataset.tratto}"]`).textContent = p.tratti[el.dataset.tratto].toFixed(2);
+    } else if (el.dataset.editor === "esasperazione") {
+      p.esasperazione = Math.min(1.5, Math.max(0.5, parseFloat(el.value) || 1));
+      $(`[data-out="esasperazione"]`).textContent = `×${p.esasperazione.toFixed(2)}`;
+    } else if (el.dataset.editor) {
+      p[el.dataset.editor] = el.value;
+      if (el.dataset.editor === "nome" && !el.value.trim()) p.nome = "Senza nome";
+    } else if (el.dataset.avatar) {
+      p.avatar = { ...p.avatar, [el.dataset.avatar]: el.dataset.avatar === "corpo" ? +el.value : el.value };
+    }
+    salvaPersonaggi();
+    aggiornaEditorInPlace(p);
+  }
+
+  Object.assign(AZIONI, {
+    "seleziona-pg": el => { editor.sel = el.dataset.id; render(); $(`[data-testid=editor-personaggio][data-id="${CSS.escape(el.dataset.id)}"]`)?.focus(); },
+    "pg-duplica": () => {
+      const p = pgSelezionato();
+      const copia = { ...clona(p), id: idUnico(p.id), nome: `${p.nome} (copia)`.slice(0, 30), principale: false, ruolo: undefined };
+      delete copia.ruolo;
+      delete copia.vincoli;
+      personaggi.splice(personaggi.indexOf(p) + 1, 0, copia);
+      editor.sel = copia.id;
+      salvaPersonaggi();
+      render();
+      toast(`Creato ${copia.nome}.`);
+    },
+    "pg-nuovo": () => {
+      const nuovo = {
+        id: idUnico("nuovo"), nome: "Nuovo personaggio", titolo: "da definire", descrizione: "", lente: "Dipende.", esasperazione: 1, voce: null,
+        tratti: Object.fromEntries(M.TRATTI.map(k => [k, 0.5])),
+        avatar: { corpo: 1, distintivo: "nessuno", colore: "#6E8B3D", pelle: PELLI[2], capelli: "#2E2E2E", taglio: "corti" },
+      };
+      personaggi.push(nuovo);
+      editor.sel = nuovo.id;
+      salvaPersonaggi();
+      render();
+      $("[data-testid=editor-nome]")?.focus();
+    },
+    "pg-elimina": () => {
+      const p = pgSelezionato();
+      if (idPredefiniti.has(p.id) || personaggi.filter(x => x.ruolo !== "terzo").length <= 3) return;
+      personaggi = personaggi.filter(x => x !== p);
+      editor.sel = personaggi[0].id;
+      salvaPersonaggi();
+      render();
+      toast(`${p.nome} è uscito di scena.`);
+    },
+    "pg-ripristina": () => {
+      personaggi = predefiniti();
+      editor.sel = personaggi[0].id;
+      salva({ personaggi: undefined });
+      render();
+      toast("Cast ripristinato ai valori predefiniti.");
+    },
+  });
+
+
   document.addEventListener("click", e => {
     const el = e.target.closest("[data-azione]");
     if (!el || el.disabled || el.getAttribute("aria-disabled") === "true") return;
@@ -1977,6 +2117,7 @@ globalThis.Asset = (() => {
     if (fn) { e.preventDefault(); fn(el); }
   });
   document.addEventListener("input", e => {
+    if (e.target.closest("[data-testid=editor]") && (e.target.dataset.tratto || e.target.dataset.editor || e.target.dataset.avatar)) inputEditor(e.target);
     if (e.target.matches("[data-testid=voto-perche]")) {
       const c = $("[data-contatore]");
       if (c) c.textContent = `${e.target.value.length}/140`;

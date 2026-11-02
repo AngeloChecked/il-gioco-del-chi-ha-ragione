@@ -49,12 +49,12 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] Revisione visiva desktop, mobile, tema scuro.
 - [x] Test unitari degli asset: SVG valido per ogni personaggio × espressione × posa e per 400 scene.
 
-## Fetta 4 — Editor personaggi (AC 8)
+## Fetta 4 — Editor personaggi (AC 8) ✅
 
-- [ ] Elenco, modifica testi, 8 cursori, esaspera, avatar, anteprima.
-- [ ] Duplica, nuovo, elimina, ripristina; persistenza.
-- [ ] I personaggi modificati entrano nelle partite e nelle lenti.
-- [ ] E2E con reload.
+- [x] Elenco, modifica testi, 8 cursori, esaspera, avatar, anteprima.
+- [x] Duplica, nuovo, elimina, ripristina; persistenza.
+- [x] I personaggi modificati entrano nelle partite e nelle lenti.
+- [x] E2E con reload.
 
 ## Fetta 5 — Laboratorio (AC 7)
 
