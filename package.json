@@ -1,0 +1,15 @@
+{
+  "name": "gioco-disagio",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "serve": "bash tests/serve.sh",
+    "smoke": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "@playwright/mcp": "^0.0.84"
+  }
+}
