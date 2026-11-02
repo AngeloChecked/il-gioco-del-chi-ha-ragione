@@ -64,16 +64,17 @@ Legenda: `[x]` fatto e verificato · `[ ]` da fare · **(AC n)** = criterio di a
 - [x] Voto previsto della ragionevolezza sensibile al contesto (bambini vicini, intensità, silenzio atteso), così le lenti si muovono nel grafico.
 - [x] Suite di accettazione AC1-AC10 completamente verde, nessun test in sviluppo.
 
-## Fetta 6 — Costruisci il caso
+## Fetta 6 — Costruisci il caso ✅
 
-- [ ] Form personaggi, luogo, condotta, modulatori, richiesta; anteprima; avvio partita.
-- [ ] "E se invece…?" dalla schermata finale precompila il form.
-- [ ] E2E.
+- [x] Form personaggi, luogo, condotta, modulatori, richiesta; anteprima; avvio partita.
+- [x] "E se invece…?" dalla schermata finale precompila il form.
+- [x] E2E.
+- [x] Probabilità del motore e distribuzione degli esiti su 200 simulazioni, per preparare casi da live.
 
-## Fetta 7 — Indovina la lente
+## Fetta 7 — Indovina la lente ✅
 
-- [ ] Scena + personaggio, previsione, rivelazione, punteggio persistente.
-- [ ] E2E.
+- [x] Scena + personaggio, previsione, rivelazione, punteggio persistente.
+- [x] E2E.
 
 ## Fetta 8 — Rifinitura
 

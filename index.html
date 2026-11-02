@@ -174,6 +174,11 @@ table.confronto td.uguale { color: var(--verde-testo); font-weight: 700; }
 .campo textarea { min-height: 80px; resize: vertical; }
 .campo[data-attiva="true"] select { border-color: var(--giallo); box-shadow: 0 0 0 2px var(--giallo); }
 .campo select:disabled { opacity: .55; }
+.barre { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.barre li { display: grid; grid-template-columns: minmax(0, 1fr) 120px 44px; gap: 8px; align-items: center; font-size: 15px; }
+.barra { height: 12px; border-radius: 6px; background: color-mix(in srgb, var(--fg) 12%, transparent); overflow: hidden; }
+.barra span { display: block; height: 100%; width: var(--v); background: var(--blu-pulsante); }
+.barre b { text-align: right; font-variant-numeric: tabular-nums; }
 .grafico > svg { width: 100%; height: auto; display: block; }
 .grafico .legenda-lenti { margin-top: 8px; }
 .grafico text { font-family: var(--font-testo); fill: var(--fg); }
@@ -657,7 +662,7 @@ globalThis.Motore = (() => {
     1: [{ id: "fastidio_comprensibile", testo: "Il fastidio di {osservatore} è comprensibile?", tipo: "scala", estremi: ["per niente", "del tutto"] }],
     2: [
       { id: "richiesta_lecita", testo: "È lecito fare questa richiesta?", tipo: "sino" },
-      { id: "richiesta_ragionevole", testo: "È ragionevole?", tipo: "scala", estremi: ["per niente", "del tutto"] },
+      { id: "richiesta_ragionevole", testo: "È ragionevole questa richiesta?", tipo: "scala", estremi: ["per niente", "del tutto"] },
       { id: "condotta_o_identita", testo: "Riguarda una condotta o un'identità?", tipo: "oggetto" },
     ],
     3: [
@@ -1907,8 +1912,8 @@ globalThis.Asset = (() => {
   const VISTE_HTML = {
     gioco: vistaGioco,
     laboratorio: () => vistaLaboratorio(),
-    indovina: () => `<div class="colonna"><section class="intro"><h2>Indovina la lente</h2><p>In arrivo.</p></section></div>`,
-    costruisci: () => `<div class="colonna"><section class="intro"><h2>Costruisci il caso</h2><p>In arrivo.</p></section></div>`,
+    indovina: () => vistaIndovina(),
+    costruisci: () => vistaCostruisci(),
     personaggi: () => vistaPersonaggi(),
   };
 
@@ -2199,6 +2204,179 @@ globalThis.Asset = (() => {
     },
   });
 
+  const costr = { params: { ...M.CASO_BASE, amici: [...M.CASO_BASE.amici] } };
+  AZIONI_ESTERNE.prefill = p => { costr.params = { ...M.CASO_BASE, ...clona(p) }; };
+
+  function campiCostruisci() {
+    const pg = personaggi.filter(p => p.ruolo !== "terzo").map(p => [p.id, p.nome]);
+    const am = costr.params.amici || [];
+    return [
+      { nome: "autore", etichetta: "Chi dà fastidio (A)", opzioni: pg, valore: costr.params.autore },
+      { nome: "osservatore", etichetta: "Chi ascolta e forse chiede (B)", opzioni: pg, valore: costr.params.osservatore },
+      { nome: "amico1", etichetta: "Amico di A", opzioni: [["", "nessuno"], ...pg], valore: am[0] || "" },
+      { nome: "amico2", etichetta: "Secondo amico", opzioni: [["", "nessuno"], ...pg], valore: am[1] || "" },
+      ...LAB_VARIABILI.map(v => ({ ...v, valore: costr.params[v.nome] })),
+    ];
+  }
+
+  function vistaCostruisci() {
+    const p = costr.params;
+    const errore = p.autore === p.osservatore ? "A e B devono essere persone diverse." : "";
+    const sit = M.costruisciSituazione({ ...p, seed: 1 }, opz());
+    const P = M.probabilita(sit);
+    const esiti = {};
+    const N = 200;
+    for (let s = 1; s <= N; s++) {
+      const passi = M.simulaPercorso({ ...sit, seed: s }, opz());
+      const u = passi.at(-1);
+      const k = `${u.livello}·${u.esito}`;
+      esiti[k] = (esiti[k] || 0) + 1;
+    }
+    const top = Object.entries(esiti).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const barra = (et, v) => `<li><span>${esc(et)}</span><span class="barra" style="--v:${Math.round(v * 100)}%"><span></span></span><b>${Math.round(v * 100)}%</b></li>`;
+    const passo0 = M.simulaPercorso(sit, opz())[0];
+    return `<div class="colonna">
+      <div class="intestazione-scena"><h2>Costruisci il caso</h2><p class="nota">Scegli tutto a mano, poi lascia girare il motore. Utile per preparare casi da discutere in live.</p></div>
+      <div class="griglia-2">
+        <div class="colonna">
+          <div class="scena-box fumetti-sotto" data-testid="costruisci-anteprima"><div class="scena-svg">${A.scena(sit, passo0, terzoPg())}</div><div class="fumetti">${fumettiHTML(sit, passo0)}</div></div>
+          <section class="scheda" data-colore="giallo" aria-labelledby="titolo-prob" data-testid="costruisci-probabilita">
+            <h3 id="titolo-prob">Cosa dice il motore</h3>
+            <ul class="barre">
+              ${barra(`Fastidio percepito da ${sit.osservatore.nome}`, P.F)}
+              ${barra("Probabilità che chieda", P.chiede)}
+              ${barra(`Probabilità che ${sit.autore.nome} accetti`, P.accetta)}
+              ${barra("Probabilità che insista dopo un no", P.insiste)}
+            </ul>
+            <h3 style="margin-top:12px">Come va a finire, su ${N} simulazioni</h3>
+            <ul class="barre" data-testid="costruisci-esiti">${top.map(([k, n]) => { const [lv, e] = k.split("·"); return barra(`Livello ${lv} · ${M.ESITI[e]}`, n / N); }).join("")}</ul>
+          </section>
+        </div>
+        <section class="scheda" data-colore="verde" aria-labelledby="titolo-costr">
+          <h3 id="titolo-costr">Ingredienti</h3>
+          <div class="campi">
+            ${campiCostruisci().map(c => `<div class="campo" data-testid="costruisci-campo" data-nome="${c.nome}"><label for="co-${c.nome}">${esc(c.etichetta)}</label><select id="co-${c.nome}" data-costr="${c.nome}">${c.opzioni.map(([v, et]) => `<option value="${esc(v)}"${String(v) === String(c.valore) ? " selected" : ""}>${esc(et)}</option>`).join("")}</select></div>`).join("")}
+          </div>
+          ${errore ? `<p class="avviso-identita" role="alert" data-testid="costruisci-errore" style="margin-top:12px">${esc(errore)}</p>` : ""}
+          <div class="pulsanti" style="margin-top:16px">
+            <button type="button" class="btn btn-grande" data-azione="costruisci-avvia" data-testid="btn-costruisci-avvia"${errore ? " disabled" : ""}>Fai partire il caso</button>
+            <button type="button" class="btn btn-sec" data-azione="costruisci-reset" data-testid="btn-costruisci-reset">Torna al caso base</button>
+          </div>
+        </section>
+      </div>
+    </div>`;
+  }
+
+  function cambiaCostruisci(el) {
+    const nome = el.dataset.costr;
+    const p = costr.params;
+    if (nome === "amico1" || nome === "amico2") {
+      const am = [...(p.amici || [])];
+      am[nome === "amico1" ? 0 : 1] = el.value;
+      p.amici = am.filter(Boolean);
+    } else {
+      const v = varLab(nome);
+      p[nome] = v?.numero ? +el.value : el.value;
+    }
+    render();
+    $(`[data-costr="${nome}"]`)?.focus();
+  }
+
+  Object.assign(AZIONI, {
+    "costruisci-avvia": () => {
+      const p = costr.params;
+      if (p.autore === p.osservatore) return;
+      avviaCostruita(clona(p));
+      $("[data-testid=livello-nome]")?.scrollIntoView({ block: "start" });
+    },
+    "costruisci-reset": () => {
+      costr.params = { ...M.CASO_BASE, amici: [...M.CASO_BASE.amici] };
+      render();
+    },
+  });
+
+  const ind = { caso: null, risposta: null };
+  const DOMANDE_INDOVINA = [[2, "richiesta_ragionevole"], [2, "richiesta_lecita"], [1, "fastidio_comprensibile"], [0, "appropriata"]];
+
+  function nuovoCasoIndovina(seed = nuovoSeed()) {
+    const sit = M.generaSituazione(seed, opz());
+    const passi = M.simulaPercorso(sit, { ...opz(), forza: { 1: "chiede" } });
+    const rnd = M.mulberry32(seed ^ 0x2545f491);
+    const pr = M.principali(personaggi);
+    const pg = pr[Math.floor(rnd() * pr.length)];
+    const [livello, domanda] = DOMANDE_INDOVINA[Math.floor(rnd() * DOMANDE_INDOVINA.length)];
+    ind.caso = { seed, sit, passi, pgId: pg.id, livello, domanda };
+    ind.risposta = null;
+  }
+
+  function vistaIndovina() {
+    if (!ind.caso) nuovoCasoIndovina();
+    const { sit, passi, pgId, livello, domanda } = ind.caso;
+    const pg = pgPerId(pgId) || M.principali(personaggi)[0];
+    const d = M.domande(livello, sit).find(x => x.id === domanda);
+    const giusto = M.votoPrevisto(pg, sit, domanda, passi);
+    const passo = { ...passi[2], testi: [passi[0].testi[1], passi[2].testi[0]] };
+    const pt = salvati.indovina || { punti: 0, tentativi: 0, serie: 0 };
+    const top = [...M.TRATTI].sort((a, b) => Math.abs(pg.tratti[b] - 0.5) - Math.abs(pg.tratti[a] - 0.5)).slice(0, 3);
+    let esito = "";
+    if (ind.risposta != null) {
+      const scarto = d.tipo === "scala" ? Math.abs(+ind.risposta - +giusto) : String(ind.risposta) === String(giusto) ? 0 : 9;
+      const punti = scarto === 0 ? 2 : scarto === 1 ? 1 : 0;
+      const etichetta = v => d.opzioni.find(o => String(o.valore) === String(v))?.etichetta || v;
+      esito = `<div class="scheda" data-colore="${punti === 2 ? "verde" : punti ? "giallo" : "rosso"}" data-testid="indovina-esito" data-punti="${punti}" role="status">
+        <h3>${punti === 2 ? "Centrato. Leggi nel pensiero." : punti ? "Quasi. Ci sei vicino." : "Mancato. Mettiti nei suoi panni, anche se stretti."}</h3>
+        <p>Hai detto <b>${esc(etichetta(ind.risposta))}</b>, ${esc(pg.nome)} direbbe <b>${esc(etichetta(giusto))}</b>.</p>
+        <p class="nota">La sua lente: «${esc(pg.lente)}»</p>
+        <button type="button" class="btn" data-azione="indovina-nuovo" data-testid="btn-indovina-nuovo">Altro caso</button>
+      </div>`;
+    }
+    return `<div class="colonna">
+      <div class="intestazione-scena"><h2>Indovina la lente</h2><p class="seed" data-testid="indovina-punteggio">Punti: ${pt.punti} · tentativi: ${pt.tentativi} · serie: ${pt.serie}</p></div>
+      <div class="griglia-2">
+        <div class="colonna">
+          <div class="scena-box fumetti-sotto" data-testid="indovina-scena"><div class="scena-svg">${A.scena(sit, passo, terzoPg())}</div><div class="fumetti">${fumettiHTML(sit, passo)}</div></div>
+          ${variabiliHTML(sit)}
+        </div>
+        <div class="colonna">
+          <section class="somiglia" data-testid="indovina-personaggio" data-id="${esc(pg.id)}">
+            ${A.avatarSVG(pg, { espressione: ind.risposta == null ? "perplesso" : "sollevato" })}
+            <div><h3>${esc(pg.nome)}, ${esc(pg.titolo || "")}</h3><p>${esc(pg.descrizione || "")}</p><p class="nota">Tratti più marcati: ${top.map(k => `${esc(M.NOMI_TRATTI[k].toLowerCase())} ${(+pg.tratti[k]).toFixed(2)}`).join(" · ")}</p></div>
+          </section>
+          <section class="scheda" data-colore="giallo" aria-labelledby="titolo-indovina">
+            <h3 id="titolo-indovina">Secondo te, come risponderebbe ${esc(pg.nome)}?</h3>
+            <p><b>${esc(d.testo)}</b></p>
+            <div class="opzioni" data-tipo="${d.tipo}" style="--n:${d.opzioni.length}" role="radiogroup" aria-label="${esc(d.testo)}">
+              ${d.opzioni.map(o => `<button type="button" class="opzione" role="radio" aria-checked="${String(ind.risposta) === String(o.valore)}" data-azione="indovina-rispondi" data-testid="indovina-opzione" data-valore="${esc(o.valore)}"${ind.risposta != null ? " disabled" : ""}>${esc(o.etichetta)}</button>`).join("")}
+            </div>
+            ${d.tipo === "scala" ? `<div class="estremi"><span>1 · ${esc(d.estremi[0])}</span><span>5 · ${esc(d.estremi[1])}</span></div>` : ""}
+          </section>
+          ${esito}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  Object.assign(AZIONI, {
+    "indovina-rispondi": el => {
+      if (ind.risposta != null) return;
+      const { sit, passi, pgId, livello, domanda } = ind.caso;
+      const d = M.domande(livello, sit).find(x => x.id === domanda);
+      ind.risposta = d.tipo === "scala" ? +el.dataset.valore : el.dataset.valore;
+      const giusto = M.votoPrevisto(pgPerId(pgId), sit, domanda, passi);
+      const scarto = d.tipo === "scala" ? Math.abs(ind.risposta - giusto) : String(ind.risposta) === String(giusto) ? 0 : 9;
+      const punti = scarto === 0 ? 2 : scarto === 1 ? 1 : 0;
+      const pt = salvati.indovina || { punti: 0, tentativi: 0, serie: 0 };
+      salva({ indovina: { punti: pt.punti + punti, tentativi: pt.tentativi + 1, serie: punti === 2 ? pt.serie + 1 : 0 } });
+      render();
+      $("[data-testid=btn-indovina-nuovo]")?.focus();
+    },
+    "indovina-nuovo": () => {
+      nuovoCasoIndovina();
+      render();
+      $("[data-testid=indovina-opzione]")?.focus();
+    },
+  });
+
   Object.assign(AZIONI, {
     "seleziona-pg": el => { editor.sel = el.dataset.id; render(); $(`[data-testid=editor-personaggio][data-id="${CSS.escape(el.dataset.id)}"]`)?.focus(); },
     "pg-duplica": () => {
@@ -2258,6 +2436,7 @@ globalThis.Asset = (() => {
   });
   document.addEventListener("change", e => {
     if (e.target.dataset.lab) cambiaLab(e.target);
+    if (e.target.dataset.costr) cambiaCostruisci(e.target);
   });
   document.addEventListener("keydown", e => {
     const el = e.target.closest?.("[role=radio]");
@@ -2293,7 +2472,7 @@ globalThis.Asset = (() => {
       applicaTema("auto");
       render();
     },
-    _interno: { stato, AZIONI, AZIONI_ESTERNE, VISTE_HTML, render, salva, storage, get personaggi() { return personaggi; }, set personaggi(v) { personaggi = v; }, salvaPersonaggi, toast, scenaHTML, avviaCostruita, paramsDaSituazione, pgPerId, opz },
+    _interno: { stato, AZIONI, AZIONI_ESTERNE, VISTE_HTML, render, salva, storage, get personaggi() { return personaggi; }, set personaggi(v) { personaggi = v; }, salvaPersonaggi, toast, scenaHTML, avviaCostruita, paramsDaSituazione, pgPerId, opz, ind, nuovoCasoIndovina, costr },
   };
 })();
 </script>
