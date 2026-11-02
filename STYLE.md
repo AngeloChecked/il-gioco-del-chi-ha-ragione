@@ -95,7 +95,8 @@ Questo avviso è l'unico testo che **non** fa battute.
 | `--fg` | `#2E3136` | `#F7F7F2` | Testo principale |
 | `--surface` | `#FFFFFF` | `#3A3E44` | Card, pannelli voto, fumetti |
 | `--muted` | `#6B6F76` | `#A9ADB3` | Testo secondario |
-| `--blu` | `#1F4E9C` | `#5B8DEF` | Pulsanti primari, intestazioni |
+| `--blu` | `#1F4E9C` | `#5B8DEF` | Intestazioni, accenti, link |
+| `--blu-pulsante` | `#1F4E9C` | `#2F62C0` | Sfondo pulsanti primari con testo bianco (in scuro `#5B8DEF` col bianco non passa AA) |
 | `--giallo` | `#F2C230` | `#F5CD4E` | Livelli intermedi, evidenziazioni, focus |
 | `--rosso` | `#C8322B` | `#E5544C` | Livelli alti, urla |
 | `--verde` | `#3F8F5B` | `#5DB37A` | Qualcuno cede, esiti pacifici |
@@ -105,12 +106,12 @@ Questo avviso è l'unico testo che **non** fa battute.
 :root {
   --asfalto:#2E3136; --gesso:#F7F7F2;
   --bg:var(--gesso); --fg:var(--asfalto); --surface:#FFFFFF; --muted:#6B6F76;
-  --blu:#1F4E9C; --giallo:#F2C230; --rosso:#C8322B; --verde:#3F8F5B; --verde-testo:#2F6E45;
+  --blu:#1F4E9C; --blu-pulsante:#1F4E9C; --giallo:#F2C230; --rosso:#C8322B; --verde:#3F8F5B; --verde-testo:#2F6E45;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#A9ADB3;
-    --blu:#5B8DEF; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
+    --blu:#5B8DEF; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
   }
 }
 :root[data-theme="dark"] { /* stessi valori del blocco sopra */ }
@@ -120,7 +121,7 @@ body { background: var(--bg); color: var(--fg); }
 ### 3.2 Regole di contrasto
 
 - Giallo **solo come riempimento**, con testo `--asfalto` sopra. Mai testo giallo su gesso.
-- Testo bianco su `--blu` e `--rosso`: ok (AA).
+- Testo bianco su `--blu-pulsante` e `--rosso`: ok (AA). Mai testo bianco su `--blu` in tema scuro.
 - Verde come testo → usare `--verde-testo`.
 - Contorni avatar sempre `--asfalto`, anche in tema scuro (gli avatar stanno su fondali chiari).
 

@@ -10,25 +10,25 @@
 :root {
   --asfalto:#2E3136; --gesso:#F7F7F2;
   --bg:var(--gesso); --fg:var(--asfalto); --surface:#FFFFFF; --muted:#6B6F76;
-  --blu:#1F4E9C; --giallo:#F2C230; --rosso:#C8322B; --verde:#3F8F5B; --verde-testo:#2F6E45;
+  --blu:#1F4E9C; --blu-pulsante:#1F4E9C; --giallo:#F2C230; --rosso:#C8322B; --verde:#3F8F5B; --verde-testo:#2F6E45;
   --font-titoli:"Bricolage Grotesque", system-ui, sans-serif;
   --font-testo:"Atkinson Hyperlegible", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#A9ADB3;
-    --blu:#5B8DEF; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
+    --blu:#5B8DEF; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
   }
 }
 :root[data-theme="dark"] {
   --bg:var(--asfalto); --fg:var(--gesso); --surface:#3A3E44; --muted:#A9ADB3;
-  --blu:#5B8DEF; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
+  --blu:#5B8DEF; --blu-pulsante:#2F62C0; --giallo:#F5CD4E; --rosso:#E5544C; --verde:#5DB37A; --verde-testo:#5DB37A;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.5 var(--font-testo); }
 header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px 24px; }
 h1 { font: 800 32px/1.1 var(--font-titoli); margin: 0; }
-.btn { font: 700 17px var(--font-titoli); color: #fff; background: var(--blu); border: 0; border-radius: 8px; padding: 10px 18px; box-shadow: inset 0 0 0 2px #fff; cursor: pointer; transition: transform .15s; }
+.btn { font: 700 17px var(--font-titoli); color: #fff; background: var(--blu-pulsante); border: 0; border-radius: 8px; padding: 10px 18px; box-shadow: inset 0 0 0 2px #fff; cursor: pointer; transition: transform .15s; }
 .btn:hover { transform: rotate(-1deg); }
 .btn:focus-visible { outline: 3px solid var(--giallo); outline-offset: 2px; }
 main { display: grid; grid-template-columns: 72px 1fr; gap: 24px; padding: 0 24px 24px; max-width: 1200px; margin: 0 auto; }
@@ -60,25 +60,31 @@ main { display: grid; grid-template-columns: 72px 1fr; gap: 24px; padding: 0 24p
     <p class="seed" data-testid="seed"></p>
   </section>
 </main>
-<script>
-const LIVELLI = ["La scena", "Il fastidio", "La richiesta", "La risposta", "Dopo il rifiuto", "Lo scontro", "La chiusura"];
-const LUOGHI = ["Parco", "Piazza affollata", "Fermata dell'autobus", "Treno regionale", "Ristorante", "Bar", "Palestra", "Cinema", "Biblioteca", "Sagrato della chiesa", "Live in streaming"];
+<script id="motore">
+globalThis.Motore = (() => {
+  const LIVELLI = ["La scena", "Il fastidio", "La richiesta", "La risposta", "Dopo il rifiuto", "Lo scontro", "La chiusura"];
+  const LUOGHI = ["Parco", "Piazza affollata", "Fermata dell'autobus", "Treno regionale", "Ristorante", "Bar", "Palestra", "Cinema", "Biblioteca", "Sagrato della chiesa", "Live in streaming"];
 
-function mulberry32(a) {
-  return function () {
-    a |= 0; a = a + 0x6D2B79F5 | 0;
-    let t = Math.imul(a ^ a >>> 15, 1 | a);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
 
+  function generaSituazione(seed) {
+    const rnd = mulberry32(seed);
+    return { seed, luogo: LUOGHI[Math.floor(rnd() * LUOGHI.length)] };
+  }
+
+  return Object.freeze({ LIVELLI, LUOGHI, mulberry32, generaSituazione });
+})();
+</script>
+<script id="app">
+const { LIVELLI, generaSituazione } = Motore;
 const stato = { seed: null, situazione: null, livello: 0, storico: [], voti: [], finito: false };
-
-function generaSituazione(seed) {
-  const rnd = mulberry32(seed);
-  return { seed, luogo: LUOGHI[Math.floor(rnd() * LUOGHI.length)] };
-}
 
 function render() {
   const sem = document.querySelector(".semaforo");
@@ -98,8 +104,13 @@ function nuova(seed = Math.floor(Math.random() * 900000) + 100000) {
 
 document.querySelector('[data-testid="btn-nuova"]').addEventListener("click", () => nuova());
 
-const daHash = location.hash.match(/^#s-(\d+)$/);
-daHash ? nuova(+daHash[1]) : render();
+function daHash() {
+  const m = location.hash.match(/^#s-(\d+)$/);
+  if (m && +m[1] !== stato.seed) nuova(+m[1]);
+  else if (!m) render();
+}
+addEventListener("hashchange", daHash);
+daHash();
 
 window.__CHR__ = {
   version: "0.0.1-skeleton",

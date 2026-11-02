@@ -9,11 +9,14 @@ Legenda: `[ ]` da fare · **(AC n)** = criterio di accettazione n della spec §1
 
 ## Fase 0 — Setup
 
-- [ ] Creare `index.html` con skeleton: `<head>` (meta viewport, charset, title "Chi ha ragione?"), `<style>`, `<main>`, `<script>`.
-- [ ] Decidere stack: **JS vanilla** (consigliato, zero dipendenze) oppure React UMD con versione fissata da cdnjs.
-- [ ] Caricare font Google: Bricolage Grotesque (600, 800) + Atkinson Hyperlegible (400, 700).
-- [ ] Definire design token CSS su `:root` (vedi `STYLE.md` §3), tema scuro con `prefers-color-scheme` + override `[data-theme]`.
-- [ ] Organizzare lo script in sezioni: `DATI` · `RNG` · `MOTORE` · `TESTI` · `ASSET SVG` · `RENDER` · `STATO` · `ROUTER` · `STORAGE`.
+- [x] Creare `index.html` con skeleton: `<head>`, `<style>`, `<main>`, script.
+- [x] Stack: **JS vanilla**, zero dipendenze runtime.
+- [x] Font Google: Bricolage Grotesque + Atkinson Hyperlegible.
+- [x] Design token CSS su `:root`, tema scuro con `prefers-color-scheme` + override `[data-theme]`.
+- [x] Script diviso in `<script id="motore">` (puro, testabile in Node) e `<script id="app">` (DOM). Vedi `tests/TEST-API.md` §0.
+- [x] Test: unitari `node:test` + fast-check, e2e `@playwright/test` (Firefox, Chromium, WebKit mobile), axe WCAG AA, suite accettazione.
+- [x] `CLAUDE.md` con comandi e regole di lavoro.
+- [ ] Hook pre-commit che lancia `npm test` (da attivare a mano, vedi `CLAUDE.md`).
 
 ## Fase 1 — Dati (spec §2, §3, §7, §8.4)
 
@@ -155,7 +158,7 @@ Legenda: `[ ]` da fare · **(AC n)** = criterio di accettazione n della spec §1
 
 ## Ordine consigliato (MVP prima)
 
-1. Fase 0 → 1 → 2 (motore testabile in console).
+1. Fase 0 → 1 → 2 (motore coperto da `npm test`).
 2. Fase 3 minima: 1 corpo, 3 espressioni, 3 scenari (parco, treno, bar), fumetto base.
 3. Fase 4 + 5 + 6: loop giocabile modalità casuale.
 4. Completare asset, poi Fasi 7–8.

@@ -2,6 +2,16 @@
 
 Il gioco (`index.html`) deve esporre questo contratto, così la suite `tests/suite.js` può pilotarlo da Chrome MCP o dalla console.
 
+## 0. Struttura di `index.html`
+
+- `<script id="motore">`: logica pura (RNG, dati, generatore, formule, escalation, testi). Definisce `globalThis.Motore`. **Non tocca DOM, `window`, `localStorage`**: i test unitari lo eseguono in `node:vm` senza browser e falliscono se lo fa.
+- `<script id="app">`: rendering, eventi, stato, storage, router. Usa `Motore` ed espone `window.__CHR__`.
+
+Test:
+- `tests/unit/*.test.mjs` → `npm test`, solo `Motore`.
+- `tests/e2e/*.spec.mjs` → `npm run e2e`, pagina vera su Firefox, Chromium, WebKit mobile, più axe in tema chiaro e scuro.
+- `tests/e2e/accettazione.spec.mjs` esegue `tests/suite.js` e si salta da solo finché `__CHR__` non è completo.
+
 ## 1. `window.__CHR__`
 
 ```ts
@@ -34,6 +44,7 @@ Requisiti:
 | `btn-avanti` | Pulsante "Cosa succede dopo" |
 | `seed` | Seed visibile (testo contiene il numero) |
 | `scena` | Contenitore SVG della scena |
+| `didascalia` | Didascalia del narratore (cartello giallo in alto nella scena) |
 | `scena-luogo` | Fondale (attributo `data-luogo`) |
 | `personaggio` | Ogni avatar in scena (attributi `data-id`, `data-ruolo`, `data-espressione`, `aria-label`) |
 | `fumetto` | Ogni fumetto (attributo `data-tipo`) |

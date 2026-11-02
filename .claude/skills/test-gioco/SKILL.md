@@ -8,7 +8,7 @@ description: Testa "Chi ha ragione?" nel browser tramite MCP (claude-in-chrome o
 Prerequisiti: `index.html` che rispetta `tests/TEST-API.md` e uno di questi MCP:
 - **Chrome**: estensione Claude in Chrome connessa (`/chrome`), strumenti `mcp__claude-in-chrome__*`.
 - **Firefox**: Playwright MCP, strumenti `mcp__playwright__*`. Già configurato nel progetto: `@playwright/mcp` in `node_modules`, server in `.mcp.json` lanciato con Node 22 (`.nvmrc`), Firefox Playwright in `~/Library/Caches/ms-playwright`. Screenshot e log in `tests/output/`.
-  Se manca il browser: `PATH=~/.nvm/versions/node/v22.23.0/bin:$PATH node node_modules/playwright-core/cli.js install firefox`.
+  Se manca il browser: `npm run browsers` (con Node 22).
 
 Mappa strumenti: aprire URL → `navigate` / `browser_navigate`; eseguire JS → `javascript_tool` / `browser_evaluate` (passare il contenuto di `suite.js` come funzione `async () => { ... }`); screenshot → `computer` screenshot / `browser_take_screenshot`; viewport → `resize_window` / `browser_resize`; console → `read_console_messages` / `browser_console_messages`.
 
@@ -16,7 +16,8 @@ Se nessun MCP browser è disponibile, fermarsi e dire all'utente di aprire la pa
 
 ## Procedura
 
-1. **Server.** Avviare in background `bash tests/serve.sh 8765`. Se la porta è occupata usare 8766.
+0. **Test automatici prima.** `npm run verifica` (unitari + e2e su 3 browser). Se falliscono, riportare e fermarsi: l'esplorazione via MCP serve per controlli visivi, non sostituisce i test.
+1. **Server.** Avviare in background `npm run serve` (porta 8765, oppure `PORT=8766 npm run serve`).
 2. **Tab.** Ottenere il contesto tab, aprire un tab nuovo su `http://localhost:8765/index.html#gioco`.
 3. **Smoke.** Leggere i messaggi di console: errori JS al caricamento = test fallito, riportare e fermarsi.
 4. **Suite desktop.** Ridimensionare a 1280x800. Leggere `tests/suite.js` ed eseguirlo con lo strumento JavaScript del tab. Il risultato è un JSON con `passati`, `falliti`, `erroriJS`, `risultati`.
@@ -31,6 +32,8 @@ Se nessun MCP browser è disponibile, fermarsi e dire all'utente di aprire la pa
 8. **Mobile.** Ridimensionare a 375x812, ricaricare, rieseguire la suite con `{ only: ["AC1","AC2","layout","a11y"] }`. Screenshot: semaforo orizzontale sopra la scena, nessuno scroll orizzontale.
 9. **Tema scuro.** Eseguire `document.documentElement.dataset.theme = "dark"`, screenshot, controllare contrasto testo e fumetti.
 10. **Pulizia.** Fermare il server, chiudere il tab.
+
+Se durante l'esplorazione si trova un bug, aggiungere un test in `tests/unit/` o `tests/e2e/` che lo riproduce prima di correggerlo.
 
 ## Report
 
